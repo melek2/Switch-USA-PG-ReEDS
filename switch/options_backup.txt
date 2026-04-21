@@ -38,8 +38,12 @@
 
 # Mosek args are from objects defined in mosek module, e.g., mosek.optimizertype.intpnt
 # also see https://docs.mosek.com/10.2/faq.pdf
-# --solver mosek --solver-options-string "iparam.optimizer=optimizertype.intpnt iparam.intpnt_basis=basindtype.never iparam.num_threads=16 dparam.intpnt_tol_pfeas=1e-6 dparam.intpnt_tol_dfeas=1e-6 dparam.intpnt_tol_rel_gap=1e-6"
---solver mosek --solver-options-string "iparam.optimizer=optimizertype.intpnt iparam.intpnt_basis=basindtype.never iparam.num_threads=16 dparam.intpnt_tol_pfeas=1e-6 dparam.intpnt_tol_dfeas=1e-6 dparam.intpnt_tol_rel_gap=1e-6"
+ --solver mosek --solver-options-string "iparam.optimizer=optimizertype.intpnt iparam.intpnt_basis=basindtype.never \
+ iparam.num_threads=16 \
+ dparam.intpnt_tol_pfeas=1e-6 \
+ dparam.intpnt_tol_dfeas=1e-6 \
+ dparam.intpnt_tol_rel_gap=1e-6"
+ 
 # MindOpt is from Alibaba -- has unlimited free use but only 1 (or maybe 8) at a time
 # https://help.aliyun.com/zh/optimization-solver/developer-reference/download-and-install-the-latest-optimization-solver-sdk
 # https://help.aliyun.com/zh/optimization-solver/getting-started/activate-and-use-the-service
