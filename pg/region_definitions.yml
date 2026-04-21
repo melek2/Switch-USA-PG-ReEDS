@@ -1,0 +1,228 @@
+model_regions:
+- AL_and_e_MS_and_FL_pnh
+- AZ
+- Bay_area
+- CO
+- CT_and_RT
+- Central_FL
+- Chicago_and_sw_MI
+- DE_and_NJ
+- GA
+- Houston_ERCOT
+- IA
+- ID_and_w_MT_and_w_WY
+- IL_no_Chicago
+- IN_and_W_KY
+- KS_and_w_MO
+- LAX
+- LA_and_e_TX
+- MA
+- MD_and_VA_Island
+- ME
+- MI
+- MN_and_e_ND
+- NC
+- NE_and_e_SD_and_w_ND_and_e_MT
+- NM_and_w_TX
+- NV_and_UT_and_n_CA
+- NY
+- New_York_City
+- OH
+- OK_and_e_NM_and_nw_TX
+- PA
+- SC
+- San_Diego
+- TN_and_s_KY
+- VA
+- VT_and_NH
+- WA_and_OR
+- WI_and_w_MI
+- WV
+- e_AR_and_w_MS
+- e_MO
+- e_Texas_ERCOT
+- e_WY_and_w_SD
+- n_KY
+- se_FL
+- w_TX_ERCOT
+region_aggregations:
+  LAX:
+  - p10
+  NY:
+  - p127
+  Bay_area:
+  - p9
+  e_Texas_ERCOT:
+  - p63
+  - p64
+  Central_FL:
+  - p101
+  PA:
+  - p115
+  - p119
+  - p120
+  - p122
+  WA_and_OR:
+  - p1
+  - p2
+  - p3
+  - p4
+  - p5
+  - p6
+  - p7
+  OH:
+  - p111
+  - p112
+  - p113
+  - p114
+  GA:
+  - p94
+  NC:
+  - p97
+  - p98
+  DE_and_NJ:
+  - p125
+  - p126
+  Chicago_and_sw_MI:
+  - p80
+  - p104
+  MI:
+  - p103
+  VA:
+  - p99
+  - p100
+  - p118
+  TN_and_s_KY:
+  - p92
+  - p93
+  se_FL:
+  - p102
+  AZ:
+  - p27
+  - p28
+  - p29
+  - p30
+  IN_and_W_KY:
+  - p105
+  - p106
+  - p107
+  - p108
+  MA:
+  - p131
+  MD_and_VA_Island:
+  - p121
+  - p123
+  - p124
+  NV_and_UT_and_n_CA:
+  - p8
+  - p12
+  - p13
+  - p25
+  - p26
+  OK_and_e_NM_and_nw_TX:
+  - p47
+  - p48
+  - p49
+  - p50
+  - p51
+  - p56
+  - p57
+  Houston_ERCOT:
+  - p67
+  AL_and_e_MS_and_FL_pnh:
+  - p88
+  - p89
+  - p90
+  - p91
+  MN_and_e_ND:
+  - p37
+  - p42
+  - p43
+  - p44
+  - p68
+  WI_and_w_MI:
+  - p46
+  - p74
+  - p75
+  - p76
+  - p77
+  - p78
+  - p79
+  LA_and_e_TX:
+  - p58
+  - p66
+  - p86
+  CO:
+  - p33
+  - p34
+  w_TX_ERCOT:
+  - p60
+  - p61
+  - p62
+  - p65
+  KS_and_w_MO:
+  - p52
+  - p53
+  - p54
+  - p55
+  SC:
+  - p95
+  - p96
+  CT_and_RT:
+  - p132
+  - p133
+  e_AR_and_w_MS:
+  - p85
+  - p87
+  e_MO:
+  - p71
+  - p72
+  - p73
+  - p84
+  n_KY:
+  - p109
+  - p110
+  ID_and_w_MT_and_w_WY:
+  - p14
+  - p15
+  - p16
+  - p17
+  - p18
+  - p19
+  - p20
+  - p21
+  - p22
+  San_Diego:
+  - p11
+  IA:
+  - p45
+  - p69
+  - p70
+  IL_no_Chicago:
+  - p81
+  - p82
+  - p83
+  NE_and_e_SD_and_w_ND_and_e_MT:
+  - p35
+  - p36
+  - p38
+  - p39
+  - p40
+  - p41
+  New_York_City:
+  - p128
+  NM_and_w_TX:
+  - p31
+  - p59
+  VT_and_NH:
+  - p129
+  - p130
+  WV:
+  - p116
+  - p117
+  ME:
+  - p134
+  e_WY_and_w_SD:
+  - p23
+  - p24
+  - p32

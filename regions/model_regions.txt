@@ -1,0 +1,228 @@
+model_regions:
+- Alabama, East Mississipi, Florida Panhandle
+- Arizona
+- Bay area
+- Central Florida
+- Chicago + Southwest Michigan
+- Colorado
+- Connecticut + Rhode Island
+- Deleware + New Jersey
+- East Arkansas + West Mississipi
+- East Missouri
+- East Texas (ERCOT)
+- East Wyoming + West South Dakota
+- Georgia
+- Houston (ERCOT)
+- Idaho + West Montana + West Wyoming
+- Illinois (no Chicago)
+- Indiana + West Kentucky
+- Iowa
+- Kansas + West Missouri
+- Los Angeles
+- Louisiana + East Texas
+- Maine
+- Marryland + Virigina Brrier Island
+- Massachusets
+- Michigan
+- Minnesota + East North Dakota
+- Nebraska + East South Dakota + West North Dakota + East Montana
+- Nevada + Utah + North CA
+- New Mexico + West Texas
+- New York City
+- New York State (Excluding NYC)
+- North Carolina
+- North Kentucky
+- Ohio
+- Oklahoma + East New Mexico + Northwest Texas
+- Pennsylvania
+- San Diego
+- South Carolina
+- Southeast Florida
+- Tennessee + South Kentucky
+- Vermont + New Hampshire
+- Virigina
+- Washington + Oregon
+- West Texas (ERCOT)
+- West Virigina
+- Wisconsin + West Michigan
+region_aggregations:
+  Los Angeles:
+  - p10
+  New York State (Excluding NYC):
+  - p127
+  Bay area:
+  - p9
+  East Texas (ERCOT):
+  - p63
+  - p64
+  Central Florida:
+  - p101
+  Pennsylvania:
+  - p115
+  - p119
+  - p120
+  - p122
+  Washington + Oregon:
+  - p1
+  - p2
+  - p3
+  - p4
+  - p5
+  - p6
+  - p7
+  Ohio:
+  - p111
+  - p112
+  - p113
+  - p114
+  Georgia:
+  - p94
+  North Carolina:
+  - p97
+  - p98
+  Deleware + New Jersey:
+  - p125
+  - p126
+  Chicago + Southwest Michigan:
+  - p80
+  - p104
+  Michigan:
+  - p103
+  Virigina:
+  - p99
+  - p100
+  - p118
+  Tennessee + South Kentucky:
+  - p88
+  - p92
+  - p93
+  Southeast Florida:
+  - p102
+  Arizona:
+  - p27
+  - p28
+  - p29
+  - p30
+  Indiana + West Kentucky:
+  - p105
+  - p106
+  - p107
+  - p108
+  Massachusets:
+  - p131
+  Marryland + Virigina Brrier Island:
+  - p121
+  - p123
+  - p124
+  Nevada + Utah + North CA:
+  - p8
+  - p12
+  - p13
+  - p25
+  - p26
+  Oklahoma + East New Mexico + Northwest Texas:
+  - p47
+  - p48
+  - p49
+  - p50
+  - p51
+  - p56
+  - p57
+  Houston (ERCOT):
+  - p67
+  Alabama, East Mississipi, Florida Panhandle:
+  - p89
+  - p90
+  - p91
+  Minnesota + East North Dakota:
+  - p37
+  - p42
+  - p43
+  - p44
+  - p68
+  Wisconsin + West Michigan:
+  - p46
+  - p74
+  - p75
+  - p76
+  - p77
+  - p78
+  - p79
+  Louisiana + East Texas:
+  - p58
+  - p66
+  - p86
+  Colorado:
+  - p33
+  - p34
+  West Texas (ERCOT):
+  - p60
+  - p61
+  - p62
+  - p65
+  Kansas + West Missouri:
+  - p52
+  - p53
+  - p54
+  - p55
+  South Carolina:
+  - p95
+  - p96
+  Connecticut + Rhode Island:
+  - p132
+  - p133
+  East Arkansas + West Mississipi:
+  - p85
+  - p87
+  East Missouri:
+  - p71
+  - p72
+  - p73
+  - p84
+  North Kentucky:
+  - p109
+  - p110
+  Idaho + West Montana + West Wyoming:
+  - p14
+  - p15
+  - p16
+  - p17
+  - p18
+  - p19
+  - p20
+  - p21
+  - p22
+  San Diego:
+  - p11
+  Iowa:
+  - p45
+  - p69
+  - p70
+  Illinois (no Chicago):
+  - p81
+  - p82
+  - p83
+  Nebraska + East South Dakota + West North Dakota + East Montana:
+  - p35
+  - p36
+  - p38
+  - p39
+  - p40
+  - p41
+  New York City:
+  - p128
+  New Mexico + West Texas:
+  - p31
+  - p59
+  Vermont + New Hampshire:
+  - p129
+  - p130
+  West Virigina:
+  - p116
+  - p117
+  Maine:
+  - p134
+  East Wyoming + West South Dakota:
+  - p23
+  - p24
+  - p32
