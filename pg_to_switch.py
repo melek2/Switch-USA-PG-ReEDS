@@ -1,6 +1,5 @@
 # TODO: compare results from this script with MIP version when running with MIP PowerGenome data, with the following turned on or off in the upstream settings: gen_tech, gen_energy_source, gen_is_variable, gen_is_baseload. Try this with and without time reduction.
 # TODO: use same timestamp formula for sampled timeseries as for full-record ones (maybe make proper time stamps?)
-# TODO: calculate interest_rate from gen_info.WACC and maybe similar info for transmission lines if not provided (avoid need for a custom switch.yml)
 # TODO (maybe): remove FLEX generators in gen_tables() and convert to custom demand response info
 # TODO: get gen_forced_outage_rate from equivalent GenX column, not custom column for Switch
 # TODO: speed up "concatenated columns" loop and RMSE calculation in powergenome.time_reduction
@@ -564,14 +563,31 @@ def gen_info_file(
                     "RPS_PROGRAM"
                 ].str[: -len(tag) - 1]
                 prog_gens_long.loc[mask, "var"] = f"send_{tag}_recs"
-            prog_gens_long = (
-                prog_gens_long.pivot(
-                    columns="var", values="value", index=["RPS_PROGRAM", "RPS_GEN"]
+            # Handle the case where no generators participate in any ESR/RPS
+            # program (e.g., when regional_tag_values is set to ~ to disable
+            # state-level policies). The pivot would produce an empty DataFrame
+            # missing the "local" column, causing a KeyError on .drop().
+            if prog_gens_long.empty:
+                import warnings
+                warnings.warn(
+                    "No generators are enrolled in any RPS/CES/ESR program. "
+                    "Writing an empty rps_generators.csv. If you expected state "
+                    "policies to be active, check 'regional_tag_values' in your "
+                    "settings files."
                 )
-                .reset_index()
-                .drop(columns=["local"])
-                .fillna(0)
-            )
+                prog_gens_long = pd.DataFrame(
+                    columns=["RPS_PROGRAM", "RPS_GEN"]
+                )
+            else:
+                prog_gens_long = (
+                    prog_gens_long.pivot(
+                        columns="var", values="value", index=["RPS_PROGRAM", "RPS_GEN"]
+                    )
+                    .reset_index()
+                    .fillna(0)
+                )
+                if "local" in prog_gens_long.columns:
+                    prog_gens_long = prog_gens_long.drop(columns=["local"])
 
             # Another way to do the same thing:
             # prog_gens_long = prog_gens_long.assign(
@@ -591,6 +607,15 @@ def gen_info_file(
     ########
     # drop the enviro program columns and save the rest
     gen_info = gen_info.drop(columns=all_prog_cols)
+    # Flag fuel-burning generators for downstream emissions accounting.
+    # Using substring match because gen_energy_source for safer matching
+    emitter_tokens = ("coal", "naturalgas", "distillate", "bio")
+    gen_info["gen_is_emitter"] = (
+        gen_info["gen_energy_source"]
+        .fillna("")
+        .str.lower()
+        .str.contains("|".join(emitter_tokens), regex=True)
+    )
     gen_info.to_csv(out_folder / "gen_info.csv", index=False, na_rep=".")
 
     ########

@@ -542,7 +542,7 @@ def infer_gen_energy_source(gen_info, settings):
         ("wind", "wind"),
         ("hydro", "water"),  # small hydro may not be marked 'HYDRO'
         ("geothermal", "geothermal"),
-        ("biomass", "biomass"),
+        # ("biomass", "biomass"),
         ("import", "imports"),
         ("demand", "demand_response"),
         ("distributed", "sun"),  # we assume distributed gen is solar
