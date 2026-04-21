@@ -32,13 +32,21 @@ Runs as part of `model_adjustment_scripts` (or standalone). Passes:
   SpillHydro absorbs avg-flow overages.
 
 CLI:
-    python adjust/clean_inputs.py <out_folder> --reeds-inputs <path> --settings <path>
+    python adjust/clean_inputs.py <out_folder> --settings <path>
+    python adjust/clean_inputs.py <out_folder> --settings <path> --reeds-inputs <path>
+
+    If --reeds-inputs is omitted, the script looks for bundled data at
+    adjust/adjust_data/reeds_data/ (relative to this script).
 
 Settings YAML usage (out_folder is prepended by model_adjustment_scripts):
     Clean inputs:
         script: adjust/clean_inputs.py
-        args: "--reeds-inputs /path/to/ReEDS-2.0/inputs --settings ../../pg/settings_46regions"
+        args: "--settings ../../pg/settings_46regions"
         order: 4
+
+    Note: relative paths in `args` are resolved from the out_folder's parent
+    (the CWD that model_adjustment_scripts uses when invoking the script),
+    which is typically switch/in_XX/<case>/<year>/.
 """
 
 import argparse
@@ -798,8 +806,9 @@ def main():
              "model_adjustment_scripts).",
     )
     parser.add_argument(
-        "--reeds-inputs", required=True, type=Path,
-        help="Path to ReEDS-2.0/inputs/",
+        "--reeds-inputs", required=False, default=None, type=Path,
+        help="Path to ReEDS-2.0/inputs/ (optional; defaults to "
+             "adjust/adjust_data/reeds_data/ next to this script).",
     )
     parser.add_argument(
         "--settings", required=True, type=str,
@@ -810,8 +819,44 @@ def main():
     if not args.out_folder.is_dir():
         logger.error(f"out_folder does not exist: {args.out_folder}")
         sys.exit(1)
-    if not args.reeds_inputs.is_dir():
-        logger.error(f"--reeds-inputs path does not exist: {args.reeds_inputs}")
+
+    # --- Resolve reeds_inputs: explicit flag > bundled local copy -----------
+    _SCRIPT_DIR = Path(__file__).resolve().parent
+    _LOCAL_REEDS = _SCRIPT_DIR / "adjust_data" / "reeds_data"
+
+    # Files that clean_geothermal and clean_biomass actually consume.
+    # Kept in sync manually with _geothermal_zone_caps and clean_biomass.
+    _REQUIRED_REEDS_FILES = [
+        Path("geothermal") / "geo_rsc_ATB_2023.csv",
+        Path("geothermal") / "geo_discovery_factor_ATB_2023.csv",
+        Path("hierarchy.csv"),
+        Path("supply_curve") / "bio_supplycurve.csv",
+    ]
+
+    if args.reeds_inputs is not None:
+        reeds_dir = args.reeds_inputs
+        if not reeds_dir.is_dir():
+            logger.error(f"--reeds-inputs path does not exist: {reeds_dir}")
+            sys.exit(1)
+        logger.info(f"[config] Using explicit --reeds-inputs: {reeds_dir}")
+    elif _LOCAL_REEDS.is_dir():
+        reeds_dir = _LOCAL_REEDS
+        missing = [p for p in _REQUIRED_REEDS_FILES
+                   if not (reeds_dir / p).is_file()]
+        if missing:
+            logger.error(
+                f"Bundled reeds data at {reeds_dir} is incomplete. Missing:\n  "
+                + "\n  ".join(str(p) for p in missing)
+                + "\nEither complete adjust/adjust_data/reeds_data/ or pass "
+                "--reeds-inputs pointing at a full ReEDS-2.0/inputs/ checkout."
+            )
+            sys.exit(1)
+        logger.info(f"[config] Using bundled reeds data: {reeds_dir}")
+    else:
+        logger.error(
+            f"No --reeds-inputs given and bundled data not found at "
+            f"{_LOCAL_REEDS}. Provide --reeds-inputs explicitly."
+        )
         sys.exit(1)
 
     settings = load_settings(path=args.settings)
@@ -832,8 +877,8 @@ def main():
         fix_biopower_heat_rate(args.out_folder)
         fix_ccs_energy_load(args.out_folder)
         # fix_coal_igcc_energy_source(args.out_folder)
-        clean_geothermal(args.out_folder, settings, args.reeds_inputs)
-        clean_biomass(args.out_folder, settings, args.reeds_inputs)
+        clean_geothermal(args.out_folder, settings, reeds_dir)
+        clean_biomass(args.out_folder, settings, reeds_dir)
         fix_hydro_flow_capacity(args.out_folder)
     except Exception as e:
         logger.error(f"[clean_inputs] failed for {args.out_folder.name}: {e}")
