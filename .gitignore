@@ -1,53 +1,83 @@
-# Ignore all subdirectories (generally pipeline outputs) except a few
-# (must be at the top to avoid unignoring previously ignored files in these
-# directories)
-*/
-!pg/
-!pg/**
-!switch/
-!switch/*
-switch/in/
-switch/out/
-!adjust/
-!adjust/**
-!PowerGenome/
-!PowerGenome/**
+# Large generated Switch input directories
+switch/in_46/
+switch/in_46_v2/
+switch/my_in/
 
-# include growth_rates/*.csv
-!growth_rates/
-growth_rates/*
-!growth_rates/*.csv
+# Generated PowerGenome resource groups
+pg/my_resource_groups/
+pg/resource_groups_CLUSTERD/
+pg/resource_groups_CLUSTERED_1_Day/
+pg/resource_groups_10weeks_7days/
 
-# user-specific configuration
-env.yml
+# Heavy PowerGenome settings caches
+pg/settings_gui/
+pg/powergenome_settings/
+pg/powergenome_settings_46regions/
 
-# large data files (too big for github, can be re-created locally)
-pg/extra_inputs/*.zip
+# Experimental settings folders (keeping only settings_10weeks_7days)
+pg/settings_46regions/
+pg/settings_CLUSTERED/
+pg/settings_CLUSTERED_1_Day/
 
-# local cluster caches
-pg/extra_inputs/cluster_assignments
+# Generated outputs
+pg/extra_outputs/
+pg/existing_plants_map.html
+pg/candidates2.csv
 
-# API keys
-*api_key.txt
+# Local-only backup files
+switch/modules_.txt
+switch/modules_Withstudymodules.txt
+switch/options_.txt
 
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
+*.egg-info/
+.pytest_cache/
 
-# editor settings
-.ipynb_checkpoints
-.vscode
-*.code-workspace
-.spyderproject
-.spyproject
+# Jupyter
+.ipynb_checkpoints/
+*-checkpoint.ipynb
 
-# VS Code settings
-.vscode
+# Environments
+.env
+.venv
+venv/
+env/
 
-# log files
-*.log
-
-# macOS metadata (can make repository impossible to clone on Windows
-Icon?
+# OS / editor
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
+
+# Large data / runtime artifacts (added after size check)
+pg_data/
+switch/in/
+switch/logs/
+switch/out/
+switch/out_mosek/
+
+# Oversized files in pg/extra_inputs/ (GitHub 100MB limit)
+pg/extra_inputs/cluster_assignments/
+pg/extra_inputs/load_adjustments.csv.zip
+pg/extra_inputs/load_adjustments_to2050.csv.zip
+pg/extra_inputs/load_adjustments.csv
+pg/extra_inputs/load_adjustments_to2050.csv
+pg/extra_inputs/reeds_2023_loads.csv
+
+# Kept local only (not pushed to GitHub)
+inputs_cleanup.ipynb
+pg/my_settings/
+pg/conus_geothermal_caps_bin_level.csv
+pg/conus_geothermal_caps_by_region.csv
+cluster_CPA_Lazard_analysis.ipynb
+cluster_comparisons.xlsx
+supply_curve_percentiles.csv
+supply_curve_percentiles_2025usd.csv
+lcoe_histograms_2025usd.png
+national_supply_curves.png
+supply_curves_2025usd.png
+supply_curves_inflation_adjusted.png
