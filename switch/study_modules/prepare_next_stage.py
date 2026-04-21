@@ -25,13 +25,34 @@ def post_solve(m, outdir):
     # model if needed.
 
     # how to choose the next year in the chain
-    model_years = [2027, 2030, 2035, 2040, 2045, 2050]
+    # model_years = [2027, 2030, 2035, 2040, 2045, 2050]
+    # we can tell which period we're dealing with by looking at m.PERIODS
+    # or outdir, which should be <root>/year/case
+    in_path = Path(m.options.inputs_dir)
+    out_path = Path(m.options.outputs_dir)
+
+    # Determine the current investment period from periods.csv, then discover
+    # future stage folders as sibling year directories under <root>.
+    current_year = int(
+        pd.read_csv(in_path / "periods.csv")["INVESTMENT_PERIOD"].iloc[0]
+    )
+    root_path = Path(*in_path.parts[:-2])
+    def _as_model_year(name):
+        try:
+            y = int(name)
+        except ValueError:
+            return None
+        return y if 2020 <= y <= 2100 and y >= current_year else None
+    model_years = sorted(
+        y for p in root_path.iterdir() if p.is_dir()
+        for y in [_as_model_year(p.name)] if y is not None
+    )
     next_year_dict = dict(zip(model_years[:-1], model_years[1:]))
 
     # we can tell which period we're dealing with by looking at m.PERIODS
     # or outdir, which should be be <root>/year/case
-    in_path = Path(m.options.inputs_dir)
-    out_path = Path(m.options.outputs_dir)
+    # in_path = Path(m.options.inputs_dir)
+    # out_path = Path(m.options.outputs_dir)
 
     year_name, case_name = out_path.parts[-2:]
 
@@ -238,7 +259,14 @@ def post_solve(m, outdir):
 
     # Merge with the predetermined construction data from the next stage.
     predet = merge_build_data(predet, "gen_build_predetermined.csv")
-    # drop any that are zero or very small
+    # Clip numerical-noise values (including tiny negatives from
+    # build - retire roundoff) to zero. Without this, a row with
+    # build_gen_predetermined == -2e-13 but a positive energy capacity can
+    # survive the filter below and then crash the next stage with
+    # "Value not in parameter domain NonNegativeReals".
+    for col in ("build_gen_predetermined", "build_gen_energy_predetermined"):
+        predet.loc[predet[col].abs() < 0.001, col] = 0.0
+    # drop any that are zero or very small in both capacity and energy
     predet = predet.query(
         "build_gen_predetermined > 0.001 or build_gen_energy_predetermined > 0.001"
     )
