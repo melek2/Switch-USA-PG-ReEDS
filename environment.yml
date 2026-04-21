@@ -3,7 +3,8 @@ channels:
 dependencies:
   - git
   - python =3.10
-  - switch_model =2.0.9
+  # - switch_model =2.0.9
+
   - gdown
   - seaborn
   - pyyaml
@@ -57,9 +58,10 @@ dependencies:
   # powergenome itself
   # note: for now we manually install a local patched version of 0.7.0 into 
   # the environment after creation instead of using the offical one
-  # - pip:
+  - pip:
   #   - powergenome==0.7.0
-
+    - git+https://github.com/melek2/switch.git@2e64799
+    # - git+https://github.com/melek2/PowerGenome.git@switch-reeds   # optional; currently installed from local submodule instead
   # pin a bunch of catalystcoop.pudl-compatible versions to speed up the conda solve
   # (everything that gets changed when you add catalystcoop.pudl to the environment
   # you would otherwise install without it)
