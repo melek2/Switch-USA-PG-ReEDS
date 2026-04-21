@@ -4,5 +4,6 @@
 	shallow = true
 [submodule "PowerGenome"]
 	path = PowerGenome
-	url = https://github.com/switch-model/PowerGenome.git
+	url = https://github.com/melek2/PowerGenome.git
 	shallow = true
+	branch = switch-reeds
