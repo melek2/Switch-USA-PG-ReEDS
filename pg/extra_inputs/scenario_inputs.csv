@@ -1,4 +1,4 @@
-﻿case_id,year,time_series,load_growth_flexibility,load_growth,allow_retirement,policies,resource_limits,fuel_price_forecast
+case_id,year,time_series,load_growth_flexibility,load_growth,allow_retirement,policies,resource_limits,fuel_price_forecast
 p1,2024,p1,none,none,yes,current,none,hist5
 p1,2030,p1,firm,icf,yes,current,none,hist5
 p1_low_gas,2030,p1,firm,icf,yes,current,low_gas,hist5
@@ -19,3 +19,21 @@ s4x1,2024,s4x1,firm,icf,yes,current,none,hist5
 s4x1,2029,s4x1,firm,icf,yes,current,none,hist5
 s4x1,2030,s4x1,firm,icf,yes,current,none,hist5
 s4x1,2035,s4x1,firm,icf,yes,current,none,hist5
+my_case_s10x1,2030,my_case_s10x1,firm,none,yes,current,none,hist5
+my_case_s10x1,2040,my_case_s10x1,firm,none,yes,current,none,hist5
+my_case_s10x1,2050,my_case_s10x1,firm,none,yes,current,none,hist5
+my_case_s10x1_v2,2035,my_case_s10x1_v2,firm,none,yes,current,none,hist5
+my_case_s10x1_v3,2035,my_case_s10x1_v3,firm,none,yes,current,none,hist5
+my_case_s10x1_v4,2035,my_case_s10x1_v4,firm,none,yes,current,none,hist5
+my_case_s10x1_v5,2035,my_case_s10x1_v5,firm,none,yes,current,none,hist5
+my_case_s10x1_v6,2035,my_case_s10x1_v6,firm,none,yes,current,none,hist5
+my_case_s10x1_v7,2035,my_case_s10x1_v7,firm,none,yes,current,none,hist5
+my_case_s10x1_v8,2035,my_case_s10x1_v8,firm,none,yes,current,none,hist5
+my_case_s7x1,2035,my_case_s7x1,firm,none,yes,current,none,hist5
+my_case_s7x1,2050,my_case_s7x1,firm,none,yes,current,none,hist5
+my_case_s1x1,2035,my_case_s1x1,firm,none,yes,current,none,hist5
+my_case_s1x1,2050,my_case_s1x1,firm,none,yes,current,none,hist5
+my_case_s1x1_v2,2035,my_case_s1x1_v2,firm,none,yes,current,none,hist5
+my_case_s1x1_v2,2050,my_case_s1x1_v2,firm,none,yes,current,none,hist5
+my_case_s10x7,2035,my_case_s10x7,firm,none,yes,current,none,hist5
+my_case_s10x7,2050,my_case_s10x7,firm,none,yes,current,none,hist5

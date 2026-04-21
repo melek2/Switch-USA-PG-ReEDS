@@ -17,7 +17,7 @@
 # load_curves_nrel_reeds table in pg_db by make_study_loads.py. Then we apply
 # ICF 2025-35 growth rates to that for 2024-2030 and report this growth as
 # flexible demand (in flexible_load.yml)
-regional_load_fn: reeds_2023_loads.csv.zip
+# regional_load_fn: reeds_2023_loads.csv.zip
 
 # name of current demand scenario; should match entries in the second row of
 # headers of `regional_load_fn`
@@ -36,12 +36,12 @@ electrification: base
 # # growth scenarios can be selected using the same AEO scenarios used for fuel
 # # prices. Examples include HIGHMACRO for high growth and LOWMACRO for low
 # # growth.
-# regular_load_growth_start_year: 2020
-# growth_scenario: REF2021
+regular_load_growth_start_year: 2020
+growth_scenario: REF2021
 
 # # Historical load profiles from load sources
 # # will use load_aeo_year or 2020 if not specified
-# load_eia_aeo_year: 2021
+load_eia_aeo_year: 2021
 
 # # *_load_region_map entries identify model regions that fall in each
 # # AEO region. `historical_load_region_map` is used prior to 2019 and
@@ -138,14 +138,14 @@ electrification: base
 # `regional_load_fn`. Not clear what happens if the same region appears more
 # than once among these sources.
 load_source_table_name:
-  ~
+  # ~
   # load_source: table_name
-  # reeds: load_curves_nrel_reeds
+  reeds: load_curves_nrel_reeds
 
 # regional_load_source should be either a name of a single load_source to use
 # for all regions or a dictionary of `load_source: [model_region1,
 # model_region2]` entries. Profiles will only be constructed for sources and
 # regions identified here. Specify USER as the load_source for regions that
 # should be pulled from regional_load_fn.
-# regional_load_source: reeds
-regional_load_source: USER
+regional_load_source: reeds
+# regional_load_source: USER
