@@ -12,7 +12,7 @@ pg/resource_groups_CLUSTERED_1_Day/
 # Heavy PowerGenome settings caches
 pg/settings_gui/
 pg/powergenome_settings/
-pg/powergenome_settings_46regions/
+# pg/powergenome_settings_46regions/
 
 # Experimental settings folders (keeping only settings_10weeks_7days)
 pg/settings_46regions/
