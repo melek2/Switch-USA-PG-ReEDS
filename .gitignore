@@ -7,7 +7,7 @@ switch/my_in/
 pg/my_resource_groups/
 pg/resource_groups_CLUSTERD/
 pg/resource_groups_CLUSTERED_1_Day/
-pg/resource_groups_10weeks_7days/
+# pg/resource_groups_10weeks_7days/
 
 # Heavy PowerGenome settings caches
 pg/settings_gui/
