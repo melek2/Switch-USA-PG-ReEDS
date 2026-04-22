@@ -1,6 +1,6 @@
 {
-  "technology": "landbasedwind",
-  "metadata": "onshorewind_lcoe_resource_groups.parquet",
-  "profiles": "onshorewind_rev_profiles_20240801.parquet",
-  "site_map": "onshorewind_site_mapping_20240801.parquet"
+    "technology": "landbasedwind",
+    "metadata": "onshorewind_lcoe_resource_groups.parquet",
+    "profiles": "onshorewind_rev_profiles_20240801_tidy.parquet",
+    "site_map": "onshorewind_site_mapping_20240801.parquet"
 }
