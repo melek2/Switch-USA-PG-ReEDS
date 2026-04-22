@@ -56,8 +56,8 @@ model_adjustment_scripts:
 # also see  for which policies apply
   Clean inputs:
     script: ../../adjust/clean_inputs.py
-    args: --reeds-inputs "/Users/melek/Documents/GitHub/ReEDS-2.0/inputs" 
+    args: --reeds-inputs "/adjust/adjust_data/reeds_data" 
       --settings 
-      "/Users/melek/Documents/GitHub/Switch-USA-PG-ReEDS/pg/settings_10weeks_7days"
+      "/pg/settings_10weeks_7days"
     order: 20
 carbon_cost_dollar_per_tco2: 33.43
