@@ -1,0 +1,1504 @@
+# TOTAL wind+solar         : 3,687,353 MW (3.69 TW), 1,078 groups
+# TOTAL wind  (all regions): 983,326 MW (0.98 TW), 513 groups
+# TOTAL solar (all regions): 2,704,027 MW (2.70 TW), 565 groups
+# Selected renewables capacity by region (MW)
+# landbasedwind:
+#   TOTAL (all regions): 983326 MW, 513 groups
+#   AL_and_e_MS_and_FL_pnh: 30735 MW, 20 groups
+#   AZ: 60471 MW, 28 groups
+#   Bay_area: 86048 MW, 63 groups
+#   CO: 26710 MW, 9 groups
+#   CT_and_RT: 1103 MW, 4 groups
+#   Central_FL: 15015 MW, 8 groups
+#   Chicago_and_sw_MI: 8428 MW, 5 groups
+#   DE_and_NJ: 3622 MW, 7 groups
+#   GA: 16998 MW, 12 groups
+#   Houston_ERCOT: 15136 MW, 10 groups
+#   IA: 21311 MW, 3 groups
+#   ID_and_w_MT_and_w_WY: 19085 MW, 6 groups
+#   IL_no_Chicago: 15432 MW, 6 groups
+#   IN_and_W_KY: 11013 MW, 4 groups
+#   KS_and_w_MO: 25852 MW, 6 groups
+#   LAX: 7058 MW, 16 groups
+#   LA_and_e_TX: 17711 MW, 12 groups
+#   MA: 7580 MW, 8 groups
+#   MD_and_VA_Island: 1675 MW, 4 groups
+#   ME: 4269 MW, 4 groups
+#   MI: 6205 MW, 6 groups
+#   MN_and_e_ND: 30923 MW, 4 groups
+#   NC: 7012 MW, 12 groups
+#   NE_and_e_SD_and_w_ND_and_e_MT: 23902 MW, 3 groups
+#   NM_and_w_TX: 11551 MW, 4 groups
+#   NV_and_UT_and_n_CA: 44012 MW, 20 groups
+#   NY: 17888 MW, 20 groups
+#   OH: 7440 MW, 6 groups
+#   OK_and_e_NM_and_nw_TX: 45490 MW, 10 groups
+#   PA: 11779 MW, 12 groups
+#   SC: 6814 MW, 7 groups
+#   San_Diego: 527 MW, 4 groups
+#   TN_and_s_KY: 52166 MW, 30 groups
+#   VA: 8382 MW, 12 groups
+#   VT_and_NH: 6809 MW, 6 groups
+#   WA_and_OR: 93375 MW, 40 groups
+#   WI_and_w_MI: 18957 MW, 12 groups
+#   WV: 7550 MW, 10 groups
+#   e_AR_and_w_MS: 31887 MW, 16 groups
+#   e_MO: 16319 MW, 6 groups
+#   e_Texas_ERCOT: 89040 MW, 18 groups
+#   e_WY_and_w_SD: 3809 MW, 2 groups
+#   n_KY: 5474 MW, 6 groups
+#   se_FL: 2429 MW, 4 groups
+#   w_TX_ERCOT: 38335 MW, 8 groups
+# utilitypv:
+#   TOTAL (all regions): 2704027 MW, 565 groups
+#   AL_and_e_MS_and_FL_pnh: 72390 MW, 14 groups
+#   AZ: 61984 MW, 10 groups
+#   Bay_area: 75921 MW, 14 groups
+#   CO: 42625 MW, 7 groups
+#   CT_and_RT: 25128 MW, 12 groups
+#   Central_FL: 103027 MW, 21 groups
+#   Chicago_and_sw_MI: 74383 MW, 12 groups
+#   DE_and_NJ: 71742 MW, 24 groups
+#   GA: 105163 MW, 18 groups
+#   Houston_ERCOT: 77891 MW, 16 groups
+#   IA: 38396 MW, 7 groups
+#   ID_and_w_MT_and_w_WY: 32355 MW, 4 groups
+#   IL_no_Chicago: 25146 MW, 6 groups
+#   IN_and_W_KY: 69344 MW, 14 groups
+#   KS_and_w_MO: 44426 MW, 6 groups
+#   LAX: 82226 MW, 24 groups
+#   LA_and_e_TX: 86707 MW, 26 groups
+#   MA: 43031 MW, 21 groups
+#   MD_and_VA_Island: 49163 MW, 17 groups
+#   ME: 8636 MW, 4 groups
+#   MI: 60672 MW, 12 groups
+#   MN_and_e_ND: 58066 MW, 8 groups
+#   NC: 94593 MW, 16 groups
+#   NE_and_e_SD_and_w_ND_and_e_MT: 41450 MW, 5 groups
+#   NM_and_w_TX: 17927 MW, 3 groups
+#   NV_and_UT_and_n_CA: 54716 MW, 12 groups
+#   NY: 89530 MW, 20 groups
+#   New_York_City: 744 MW, 4 groups
+#   OH: 100259 MW, 15 groups
+#   OK_and_e_NM_and_nw_TX: 76007 MW, 8 groups
+#   PA: 90295 MW, 20 groups
+#   SC: 54388 MW, 12 groups
+#   San_Diego: 11110 MW, 8 groups
+#   TN_and_s_KY: 76608 MW, 10 groups
+#   VA: 128440 MW, 18 groups
+#   VT_and_NH: 12771 MW, 5 groups
+#   WA_and_OR: 121580 MW, 30 groups
+#   WI_and_w_MI: 47435 MW, 10 groups
+#   WV: 18253 MW, 7 groups
+#   e_AR_and_w_MS: 43638 MW, 7 groups
+#   e_MO: 26000 MW, 7 groups
+#   e_Texas_ERCOT: 155701 MW, 16 groups
+#   e_WY_and_w_SD: 7270 MW, 1 groups
+#   n_KY: 32906 MW, 9 groups
+#   se_FL: 28559 MW, 13 groups
+#   w_TX_ERCOT: 65426 MW, 12 groups
+cluster_with_retired_gens: true
+num_clusters:
+  Conventional Steam Coal: 1
+  Natural Gas Fired Combined Cycle: 1
+  Natural Gas Fired Combustion Turbine: 1
+  Nuclear: 1
+  Conventional Hydroelectric: 1
+  Solar Photovoltaic: 1
+  Onshore Wind Turbine: 1
+  Batteries: 1
+group_technologies: true
+tech_groups:
+  Biomass:
+  - Wood/Wood Waste Biomass
+  - Landfill Gas
+  - Municipal Solid Waste
+  - Other Waste Biomass
+  Other_peaker:
+  - Natural Gas Internal Combustion Engine
+  - Petroleum Liquids
+hydro_factor: 2
+regional_hydro_factor:
+  WA_and_OR: 4
+energy_storage_duration:
+  Hydroelectric Pumped Storage: 15.5
+  Batteries: 2
+resource_data_year: 2024
+resource_financial_case: Market
+resource_cap_recovery_years: 20
+alt_resource_cap_recovery_years:
+  Battery: 15
+  Nuclear: 40
+new_resources:
+- - UtilityPV
+  - Class1
+  - Moderate
+  - 100
+- - Nuclear
+  - Nuclear - Large
+  - Moderate
+  - 1000
+- - Utility-Scale Battery Storage
+  - Lithium Ion
+  - Moderate
+  - 60
+- - Biopower
+  - Dedicated
+  - Moderate
+  - 50
+- - Coal
+  - IGCC
+  - Moderate
+  - 641
+- - Coal
+  - IGCC-90%-CCS
+  - Moderate
+  - 100
+- - Geothermal
+  - HydroBinary
+  - Moderate
+  - 100
+- - LandbasedWind
+  - Class4
+  - Moderate
+  - 200
+- - NaturalGas
+  - 2-on-1 Combined Cycle (H-Frame)
+  - Moderate
+  - 992
+- - NaturalGas
+  - 2-on-1 Combined Cycle (H-Frame) 95% CCS
+  - Moderate
+  - 877
+- - NaturalGas
+  - Combustion Turbine (F-Frame)
+  - Moderate
+  - 233
+- - OffShoreWind
+  - Class3
+  - Moderate
+  - 500
+- - OffShoreWind
+  - Class12
+  - Moderate
+  - 500
+interconnect_capex_mw: 100000
+cache_resource_clusters: true
+use_resource_clusters_cache: true
+renewables_clusters:
+- region: AL_and_e_MS_and_FL_pnh
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 69.78
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 4
+    mw_per_bin: 7684
+  cluster:
+  - feature: cf
+    n_clusters: 5
+    method: agg
+- region: AZ
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 51.41
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 7
+    mw_per_bin: 8639
+  cluster:
+  - feature: cf
+    n_clusters: 4
+    method: agg
+- region: Bay_area
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 148.26
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 9
+    mw_per_bin: 9561
+  cluster:
+  - feature: cf
+    n_clusters: 7
+    method: agg
+- region: CO
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 30.54
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 3
+    mw_per_bin: 8903
+  cluster:
+  - feature: cf
+    n_clusters: 3
+    method: agg
+- region: CT_and_RT
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 94.9
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 1103
+  cluster:
+  - feature: cf
+    n_clusters: 4
+    method: agg
+- region: Central_FL
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 62.71
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 7507
+  cluster:
+  - feature: cf
+    n_clusters: 4
+    method: agg
+- region: Chicago_and_sw_MI
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 44.46
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 8428
+  cluster:
+  - feature: cf
+    n_clusters: 5
+    method: agg
+- region: DE_and_NJ
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 85.21
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 3622
+  cluster:
+  - feature: cf
+    n_clusters: 7
+    method: agg
+- region: GA
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 76.7
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 8499
+  cluster:
+  - feature: cf
+    n_clusters: 6
+    method: agg
+- region: Houston_ERCOT
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 49.79
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 7568
+  cluster:
+  - feature: cf
+    n_clusters: 5
+    method: agg
+- region: IA
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 25.6
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 3
+    mw_per_bin: 7104
+  cluster:
+  - feature: cf
+    n_clusters: 1
+    method: agg
+- region: ID_and_w_MT_and_w_WY
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 30.31
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 9542
+  cluster:
+  - feature: cf
+    n_clusters: 3
+    method: agg
+- region: IL_no_Chicago
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 31.93
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 7716
+  cluster:
+  - feature: cf
+    n_clusters: 3
+    method: agg
+- region: IN_and_W_KY
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 39.36
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 5506
+  cluster:
+  - feature: cf
+    n_clusters: 2
+    method: agg
+- region: KS_and_w_MO
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 24.58
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 3
+    mw_per_bin: 8617
+  cluster:
+  - feature: cf
+    n_clusters: 2
+    method: agg
+- region: LAX
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 147.29
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 7058
+  cluster:
+  - feature: cf
+    n_clusters: 16
+    method: agg
+- region: LA_and_e_TX
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 60.5
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 8856
+  cluster:
+  - feature: cf
+    n_clusters: 6
+    method: agg
+- region: MA
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 58.2
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 7580
+  cluster:
+  - feature: cf
+    n_clusters: 8
+    method: agg
+- region: MD_and_VA_Island
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 70.84
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 1675
+  cluster:
+  - feature: cf
+    n_clusters: 4
+    method: agg
+- region: ME
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 35.4
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 4269
+  cluster:
+  - feature: cf
+    n_clusters: 4
+    method: agg
+- region: MI
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 44.33
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 6205
+  cluster:
+  - feature: cf
+    n_clusters: 6
+    method: agg
+- region: MN_and_e_ND
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 25.9
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 4
+    mw_per_bin: 7731
+  cluster:
+  - feature: cf
+    n_clusters: 1
+    method: agg
+- region: NC
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 96.17
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 7012
+  cluster:
+  - feature: cf
+    n_clusters: 12
+    method: agg
+- region: NE_and_e_SD_and_w_ND_and_e_MT
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 25.03
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 3
+    mw_per_bin: 7967
+  cluster:
+  - feature: cf
+    n_clusters: 1
+    method: agg
+- region: NM_and_w_TX
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 28.18
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 5776
+  cluster:
+  - feature: cf
+    n_clusters: 2
+    method: agg
+- region: NV_and_UT_and_n_CA
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 42.97
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 5
+    mw_per_bin: 8802
+  cluster:
+  - feature: cf
+    n_clusters: 4
+    method: agg
+- region: NY
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 86.04
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 8944
+  cluster:
+  - feature: cf
+    n_clusters: 10
+    method: agg
+- region: OH
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 54.96
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 7440
+  cluster:
+  - feature: cf
+    n_clusters: 6
+    method: agg
+- region: OK_and_e_NM_and_nw_TX
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 24.87
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 5
+    mw_per_bin: 9098
+  cluster:
+  - feature: cf
+    n_clusters: 2
+    method: agg
+- region: PA
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 89.2
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 5889
+  cluster:
+  - feature: cf
+    n_clusters: 6
+    method: agg
+- region: SC
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 80.3
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 6814
+  cluster:
+  - feature: cf
+    n_clusters: 7
+    method: agg
+- region: San_Diego
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 134.04
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 527
+  cluster:
+  - feature: cf
+    n_clusters: 4
+    method: agg
+- region: TN_and_s_KY
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 102.43
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 6
+    mw_per_bin: 8694
+  cluster:
+  - feature: cf
+    n_clusters: 5
+    method: agg
+- region: VA
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 102.61
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 8382
+  cluster:
+  - feature: cf
+    n_clusters: 12
+    method: agg
+- region: VT_and_NH
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 45.12
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 6809
+  cluster:
+  - feature: cf
+    n_clusters: 6
+    method: agg
+- region: WA_and_OR
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 68.15
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 10
+    mw_per_bin: 9338
+  cluster:
+  - feature: cf
+    n_clusters: 4
+    method: agg
+- region: WI_and_w_MI
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 50.49
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 9479
+  cluster:
+  - feature: cf
+    n_clusters: 6
+    method: agg
+- region: WV
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 111.56
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 7550
+  cluster:
+  - feature: cf
+    n_clusters: 10
+    method: agg
+- region: e_AR_and_w_MS
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 41.3
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 4
+    mw_per_bin: 7972
+  cluster:
+  - feature: cf
+    n_clusters: 4
+    method: agg
+- region: e_MO
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 32.65
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 8159
+  cluster:
+  - feature: cf
+    n_clusters: 3
+    method: agg
+- region: e_Texas_ERCOT
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 30.06
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 9
+    mw_per_bin: 9893
+  cluster:
+  - feature: cf
+    n_clusters: 2
+    method: agg
+- region: e_WY_and_w_SD
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 23.36
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 3809
+  cluster:
+  - feature: cf
+    n_clusters: 2
+    method: agg
+- region: n_KY
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 59.5
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 5474
+  cluster:
+  - feature: cf
+    n_clusters: 6
+    method: agg
+- region: se_FL
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 54.37
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 2429
+  cluster:
+  - feature: cf
+    n_clusters: 4
+    method: agg
+- region: w_TX_ERCOT
+  technology: landbasedwind
+  filter:
+  - feature: lcoe
+    max: 27.45
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 4
+    mw_per_bin: 9584
+  cluster:
+  - feature: cf
+    n_clusters: 2
+    method: agg
+- region: AL_and_e_MS_and_FL_pnh
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 30.82
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 36195
+  cluster:
+  - feature: lcoe
+    n_clusters: 7
+    method: agg
+- region: AZ
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 24.73
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 30992
+  cluster:
+  - feature: lcoe
+    n_clusters: 5
+    method: agg
+- region: Bay_area
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 30.89
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 37961
+  cluster:
+  - feature: lcoe
+    n_clusters: 7
+    method: agg
+- region: CO
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 26.51
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 42625
+  cluster:
+  - feature: lcoe
+    n_clusters: 7
+    method: agg
+- region: CT_and_RT
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 37.01
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 25128
+  cluster:
+  - feature: lcoe
+    n_clusters: 12
+    method: agg
+- region: Central_FL
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 34.45
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 3
+    mw_per_bin: 34342
+  cluster:
+  - feature: lcoe
+    n_clusters: 7
+    method: agg
+- region: Chicago_and_sw_MI
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 32.21
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 37191
+  cluster:
+  - feature: lcoe
+    n_clusters: 6
+    method: agg
+- region: DE_and_NJ
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 41.23
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 35871
+  cluster:
+  - feature: lcoe
+    n_clusters: 12
+    method: agg
+- region: GA
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 32.41
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 3
+    mw_per_bin: 35054
+  cluster:
+  - feature: lcoe
+    n_clusters: 6
+    method: agg
+- region: Houston_ERCOT
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 32.85
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 38946
+  cluster:
+  - feature: lcoe
+    n_clusters: 8
+    method: agg
+- region: IA
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 27.91
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 38396
+  cluster:
+  - feature: lcoe
+    n_clusters: 7
+    method: agg
+- region: ID_and_w_MT_and_w_WY
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 26.57
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 32355
+  cluster:
+  - feature: lcoe
+    n_clusters: 4
+    method: agg
+- region: IL_no_Chicago
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 29.68
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 25146
+  cluster:
+  - feature: lcoe
+    n_clusters: 6
+    method: agg
+- region: IN_and_W_KY
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 30.84
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 34672
+  cluster:
+  - feature: lcoe
+    n_clusters: 7
+    method: agg
+- region: KS_and_w_MO
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 26.08
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 44426
+  cluster:
+  - feature: lcoe
+    n_clusters: 6
+    method: agg
+- region: LAX
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 43.69
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 41113
+  cluster:
+  - feature: lcoe
+    n_clusters: 12
+    method: agg
+- region: LA_and_e_TX
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 37.11
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 43354
+  cluster:
+  - feature: lcoe
+    n_clusters: 13
+    method: agg
+- region: MA
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 57.11
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 43031
+  cluster:
+  - feature: lcoe
+    n_clusters: 21
+    method: agg
+- region: MD_and_VA_Island
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 40.01
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 49163
+  cluster:
+  - feature: lcoe
+    n_clusters: 17
+    method: agg
+- region: ME
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 31.97
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 8636
+  cluster:
+  - feature: lcoe
+    n_clusters: 4
+    method: agg
+- region: MI
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 32.54
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 30336
+  cluster:
+  - feature: lcoe
+    n_clusters: 6
+    method: agg
+- region: MN_and_e_ND
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 28.79
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 29033
+  cluster:
+  - feature: lcoe
+    n_clusters: 4
+    method: agg
+- region: NC
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 33.01
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 47297
+  cluster:
+  - feature: lcoe
+    n_clusters: 8
+    method: agg
+- region: NE_and_e_SD_and_w_ND_and_e_MT
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 26.05
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 41450
+  cluster:
+  - feature: lcoe
+    n_clusters: 5
+    method: agg
+- region: NM_and_w_TX
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 23.82
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 17927
+  cluster:
+  - feature: lcoe
+    n_clusters: 3
+    method: agg
+- region: NV_and_UT_and_n_CA
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 26.59
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 27358
+  cluster:
+  - feature: lcoe
+    n_clusters: 6
+    method: agg
+- region: NY
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 35.48
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 44765
+  cluster:
+  - feature: lcoe
+    n_clusters: 10
+    method: agg
+- region: New_York_City
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 95.02
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 744
+  cluster:
+  - feature: lcoe
+    n_clusters: 4
+    method: agg
+- region: OH
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 31.31
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 3
+    mw_per_bin: 33420
+  cluster:
+  - feature: lcoe
+    n_clusters: 5
+    method: agg
+- region: OK_and_e_NM_and_nw_TX
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 24.4
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 38003
+  cluster:
+  - feature: lcoe
+    n_clusters: 4
+    method: agg
+- region: PA
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 34.43
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 45147
+  cluster:
+  - feature: lcoe
+    n_clusters: 10
+    method: agg
+- region: SC
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 32.98
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 27194
+  cluster:
+  - feature: lcoe
+    n_clusters: 6
+    method: agg
+- region: San_Diego
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 36.52
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 11110
+  cluster:
+  - feature: lcoe
+    n_clusters: 8
+    method: agg
+- region: TN_and_s_KY
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 29.46
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 38304
+  cluster:
+  - feature: lcoe
+    n_clusters: 5
+    method: agg
+- region: VA
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 33.18
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 3
+    mw_per_bin: 42813
+  cluster:
+  - feature: lcoe
+    n_clusters: 6
+    method: agg
+- region: VT_and_NH
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 33.98
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 12771
+  cluster:
+  - feature: lcoe
+    n_clusters: 5
+    method: agg
+- region: WA_and_OR
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 34.99
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 3
+    mw_per_bin: 40527
+  cluster:
+  - feature: lcoe
+    n_clusters: 10
+    method: agg
+- region: WI_and_w_MI
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 31.67
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 47435
+  cluster:
+  - feature: lcoe
+    n_clusters: 10
+    method: agg
+- region: WV
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 33.14
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 18253
+  cluster:
+  - feature: lcoe
+    n_clusters: 7
+    method: agg
+- region: e_AR_and_w_MS
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 28.76
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 43638
+  cluster:
+  - feature: lcoe
+    n_clusters: 7
+    method: agg
+- region: e_MO
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 29.54
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 26000
+  cluster:
+  - feature: lcoe
+    n_clusters: 7
+    method: agg
+- region: e_Texas_ERCOT
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 29.41
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 4
+    mw_per_bin: 38925
+  cluster:
+  - feature: lcoe
+    n_clusters: 4
+    method: agg
+- region: e_WY_and_w_SD
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 25.92
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 7270
+  cluster:
+  - feature: lcoe
+    n_clusters: 1
+    method: agg
+- region: n_KY
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 30.84
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 32906
+  cluster:
+  - feature: lcoe
+    n_clusters: 9
+    method: agg
+- region: se_FL
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 39.92
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 1
+    mw_per_bin: 28559
+  cluster:
+  - feature: lcoe
+    n_clusters: 13
+    method: agg
+- region: w_TX_ERCOT
+  technology: utilitypv
+  filter:
+  - feature: lcoe
+    max: 28.75
+  bin:
+  - feature: lcoe
+    weights: capacity_mw
+    q: 2
+    mw_per_bin: 32713
+  cluster:
+  - feature: lcoe
+    n_clusters: 6
+    method: agg
+resource_modifiers:
+  utilitypv_class1:
+    technology: UtilityPV
+    tech_detail: Class1
+  nuclear_nuclear_large:
+    technology: Nuclear
+    tech_detail: Nuclear - Large
+  utility_scale_battery_storage_lithium_ion:
+    technology: Utility-Scale Battery Storage
+    tech_detail: Lithium Ion
+    Var_OM_Cost_per_MWh: 0.15
+    Var_OM_Cost_per_MWh_In: 0.15
+  biopower_dedicated:
+    technology: Biopower
+    tech_detail: Dedicated
+  coal_igcc:
+    technology: Coal
+    tech_detail: IGCC
+  coal_igcc_90_ccs:
+    technology: Coal
+    tech_detail: IGCC-90%-CCS
+  geothermal_hydrobinary:
+    technology: Geothermal
+    tech_detail: HydroBinary
+  landbasedwind_class4:
+    technology: LandbasedWind
+    tech_detail: Class4
+  naturalgas_2_on_1_combined_cycle_h_frame:
+    technology: NaturalGas
+    tech_detail: 2-on-1 Combined Cycle (H-Frame)
+  naturalgas_2_on_1_combined_cycle_h_frame_95_ccs:
+    technology: NaturalGas
+    tech_detail: 2-on-1 Combined Cycle (H-Frame) 95% CCS
+  naturalgas_combustion_turbine_f_frame:
+    technology: NaturalGas
+    tech_detail: Combustion Turbine (F-Frame)
+  offshorewind_class3:
+    technology: OffShoreWind
+    tech_detail: Class3
+  offshorewind_class12:
+    technology: OffShoreWind
+    tech_detail: Class12

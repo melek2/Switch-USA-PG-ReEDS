@@ -1,0 +1,118 @@
+model_tag_names:
+- THERM
+- VRE
+- Num_VRE_Bins
+- MUST_RUN
+- STOR
+- FLEX
+- HYDRO
+- LDS
+- Commit
+- New_Build
+- CapRes_1
+- CapRes_2
+- MinCapTag_1
+- MinCapTag_2
+- MinCapTag_3
+- Reg_Max
+- Rsv_Max
+- CO2_Capture_Fraction
+- CO2_Capture_Fraction_Startup
+- CCS_Disposal_Cost_per_Metric_Ton
+default_model_tag: 0
+model_tag_values:
+  THERM:
+    Conventional Steam Coal: 1
+    Natural Gas Fired Combined Cycle: 1
+    Natural Gas Fired Combustion Turbine: 1
+    Natural Gas Internal Combustion Engine: 1
+    Natural Gas Steam Turbine: 1
+    Other_peaker: 1
+    Petroleum Liquids: 1
+    Nuclear: 1
+    NaturalGas_: 1
+  VRE:
+    LandbasedWind: 1
+    Onshore Wind: 1
+    OffshoreWind: 1
+    Offshore Wind Turbine: 1
+    Solar Photovoltaic: 1
+    UtilityPV: 1
+  Num_VRE_Bins:
+    LandbasedWind: 1
+    Onshore Wind: 1
+    OffshoreWind: 1
+    Offshore Wind Turbine: 1
+    Solar Photovoltaic: 1
+    UtilityPV: 1
+  STOR:
+    Batteries: 1
+    Battery: 1
+    Hydroelectric Pumped Storage: 1
+  HYDRO:
+    Conventional Hydroelectric: 1
+    Hydropower: 1
+  MUST_RUN:
+    Small Hydroelectric: 1
+    Geothermal: 1
+    Wood/Wood Waste Biomass: 1
+    Biomass: 1
+    distributed_gen: 1
+    Run of River Hydroelectric: 1
+  Commit:
+    Conventional Steam Coal: 1
+    Natural Gas Fired Combined Cycle: 1
+    Natural Gas Fired Combustion Turbine: 1
+    Natural Gas Internal Combustion Engine: 1
+    Natural Gas Steam Turbine: 1
+    Other_peaker: 1
+    Petroleum Liquids: 1
+    Nuclear: 1
+  New_Build:
+    NaturalGas: 1
+    LandbasedWind: 1
+    UtilityPV: 1
+    Battery: 1
+    Nuclear_Nuclear: 1
+  CapRes_1:
+    Conventional Steam Coal: 0.9
+    Natural Gas Fired Combined Cycle: 0.9
+    Natural Gas Fired Combustion Turbine: 0.9
+    Natural Gas Internal Combustion Engine: 0.9
+    Natural Gas Steam Turbine: 0.9
+    Other_peaker: 0.9
+    Petroleum Liquids: 0.9
+    Nuclear: 0.9
+    LandbasedWind: 0.8
+    UtilityPV: 0.8
+    Battery: 0.95
+    Hydroelectric Pumped Storage: 0.95
+  CapRes_2:
+    Conventional Steam Coal: 0.9
+    Natural Gas Fired Combined Cycle: 0.9
+    Natural Gas Fired Combustion Turbine: 0.9
+    Natural Gas Internal Combustion Engine: 0.9
+    Natural Gas Steam Turbine: 0.9
+    Other_peaker: 0.9
+    Petroleum Liquids: 0.9
+    Nuclear: 0.9
+    LandbasedWind: 0.8
+    UtilityPV: 0.8
+    Battery: 0.95
+    Hydroelectric Pumped Storage: 0.95
+  MinCapTag_1: {}
+  MinCapTag_2: {}
+  MinCapTag_3: {}
+  FLEX: {}
+  LDS: {}
+  Reg_Max: {}
+  Rsv_Max: {}
+  CO2_Capture_Fraction:
+    NaturalGas_2-on-1 Combined Cycle (H-Frame) 95% CCS: 0.95
+    Coal_IGCC-90%-CCS: 0.9
+  CO2_Capture_Fraction_Startup:
+    NaturalGas_2-on-1 Combined Cycle (H-Frame) 95% CCS: 0.95
+    Coal_IGCC-90%-CCS: 0.9
+  CCS_Disposal_Cost_per_Metric_Ton:
+    NaturalGas_2-on-1 Combined Cycle (H-Frame) 95% CCS: 20.0
+    Coal_IGCC-90%-CCS: 20.0

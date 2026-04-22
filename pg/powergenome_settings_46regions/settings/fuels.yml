@@ -1,0 +1,20 @@
+fuel_data_year: 2025
+fuel_scenarios:
+  coal: reference
+  naturalgas: reference
+  distillate: reference
+  uranium: reference
+tech_fuel_map:
+  Conventional Steam Coal: coal
+  Natural Gas Fired Combined Cycle: naturalgas
+  Natural Gas Fired Combustion Turbine: naturalgas
+  Natural Gas Steam Turbine: naturalgas
+  Natural Gas Internal Combustion Engine: naturalgas
+  Other_peaker: naturalgas
+  NaturalGas: naturalgas
+  Petroleum Liquids: distillate
+  Nuclear: uranium
+fuel_emission_factors:
+  naturalgas: 0.05306
+  coal: 0.09552
+  distillate: 0.07315
