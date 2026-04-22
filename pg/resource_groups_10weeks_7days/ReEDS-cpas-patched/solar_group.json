@@ -1,0 +1,6 @@
+{
+  "technology": "utilitypv",
+  "metadata": "solar_lcoe_resource_groups.parquet",
+  "profiles": "solar_rev_profiles_20240801.parquet",
+  "site_map": "solar_site_mapping_20240801.parquet"
+}

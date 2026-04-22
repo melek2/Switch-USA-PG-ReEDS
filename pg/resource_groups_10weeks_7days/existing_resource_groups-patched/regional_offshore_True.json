@@ -1,0 +1,6 @@
+{
+    "technology": "offshorewind",
+    "existing": true,
+    "metadata": "existing_offshorewind_reeds_ba_metadata.csv",
+    "profiles": "existing_osw_profiles.csv"
+}
