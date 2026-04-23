@@ -1,0 +1,5 @@
+{
+    "technology": "imports",
+    "metadata": "imports_metadata.csv",
+    "profiles": "imports_profiles.csv"
+}
