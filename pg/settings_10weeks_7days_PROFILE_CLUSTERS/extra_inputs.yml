@@ -25,8 +25,7 @@ misc_gen_inputs_fn: misc_gen_inputs.csv
 # but we use reeds_ba_tx_REFS2009_avg.csv, which has some additional lines that
 # get dropped because of this, so we use a quick-patched version (dump in the 
 # missing lines and assign average params to them)
-user_transmission_costs: 
-  pg/powergenome_settings_46regions/data/network_costs_46r_eastern-ercot-western_st.csv
+user_transmission_costs: network_costs_46r_eastern-ercot-western_st.csv
 # the reeds_ba_tx_NARIS_avg data don't have enough transmission to serve p119
 # during certain timepoints in a 2024 model, so we use REFS2009 instead. see
 # cryptic documentation at
