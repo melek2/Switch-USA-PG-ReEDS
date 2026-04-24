@@ -24,8 +24,12 @@
 #    VOC always uses the ground column (per SI Table S1 footnote b: VOC stack
 #    emissions are rare and not well characterized at stack height).
 # 6. **Non-Emitter Handling** – Non-emitting sources (wind, solar, hydro, nuclear,
-#    hydrogen, storage, heat) are EXCLUDED from gen_emission_costs.csv entirely
-#    rather than written with zeros.
+#    hydrogen, storage, heat) skip the MV lookup pipeline (no meaningful damage
+#    values to compute), but are written to gen_emission_costs.csv with zeros for
+#    all cost and intensity columns. This is required: Switch's DataPortal
+#    implicitly uses the GENERATION_PROJECT column of this file to define
+#    GENERATION_PROJECTS, so any generator absent from this file is silently
+#    dropped from the model.
 # 7. **Cost Conversion** – Adjusts marginal damage costs from 2011 to the financial 
 #    base year using a fixed cumulative inflation rate.
 # 8. **Outputs** – Produces:
@@ -415,6 +419,12 @@ EmissionFactorsNERC  = pd.read_csv(table5_file)
 MV                   = pd.read_csv(mv_file)
 IPM_to_NERC_mapping  = pd.read_csv(IPM2NERC_file)
 plant_hist_emissions = pd.read_csv(plant_emissions_file)
+# Stash the authoritative list of all GENERATION_PROJECTs before any in-memory
+# filtering (coordinate validation, non-emitter drops, etc.) reduces gen_info.
+# gen_emission_costs.csv MUST cover every ID in gen_info.csv on disk, otherwise
+# Pyomo's DataPortal silently shrinks GENERATION_PROJECTS.
+all_gen_ids = gen_info["GENERATION_PROJECT"].drop_duplicates().tolist()
+print(f"[INFO] Stashed {len(all_gen_ids):,} GENERATION_PROJECT IDs for final padding.")
 # scalar base year
 base_financial_year = int(pd.Series(financials['base_financial_year']).iloc[0])
 print(f"Loaded. base_financial_year={base_financial_year}, gen_info={len(gen_info):,} rows, fuels={len(fuels):,} rows.")
@@ -961,13 +971,16 @@ print(
     + ", ".join(f"{k}={v}" for k, v in gen_all["stack_height"].value_counts().items())
 )
 
-# Drop non-emitting generators from the emissions-cost pipeline entirely.
-# (Non-emitters will not appear in gen_emission_costs.csv.)
+# Skip non-emitters in the MV lookup pipeline (wasteful and the values would be
+# meaningless), but stash their IDs so we can pad them back with zeros at the
+# end. All generators must appear in gen_emission_costs.csv to avoid Pyomo's
+# DataPortal silently shrinking GENERATION_PROJECTS.
 non_emitters = [k for k, v in fuel_map.items() if v is None]
 is_non_emitter = gen_all["gen_energy_source"].astype(str).str.lower().isin(non_emitters)
+non_emitter_ids = gen_all.loc[is_non_emitter, "GENERATION_PROJECT"].tolist()
 print(
-    f"[INFO] Excluding {int(is_non_emitter.sum()):,} non-emitting generators "
-    f"(sources: {non_emitters}) from gen_emission_costs.csv."
+    f"[INFO] Skipping MV lookup for {len(non_emitter_ids):,} non-emitting "
+    f"generators (sources: {non_emitters}); they'll be padded with zeros."
 )
 gen_all = gen_all.loc[~is_non_emitter].copy().reset_index(drop=True)
 print(f"[INFO] {len(gen_all):,} emitting generators remain for MV lookup.")
@@ -1091,7 +1104,36 @@ expected = {
 }
 missing = expected - set(gen_emission_costs.columns)
 assert not missing, f"Missing required cost columns: {missing}"
+# Pad ANY missing GENERATION_PROJECTs with zeros so gen_emission_costs.csv covers
+# every ID in gen_info.csv on disk. Missing IDs come from two sources:
+#   (1) non-emitters skipped from the MV lookup pipeline, and
+#   (2) generators dropped during coordinate validation (mostly renewable
+#       cluster reps with no physical lat/lon).
+# Both must appear in the output or Pyomo's DataPortal will shrink
+# GENERATION_PROJECTS to the emitting+geocoded subset and break gen_tech.
+covered = set(gen_emission_costs["GENERATION_PROJECT"])
+missing_ids = [g for g in all_gen_ids if g not in covered]
+numeric_cols = [c for c in gen_emission_costs.columns if c != "GENERATION_PROJECT"]
+pad = pd.DataFrame({
+    "GENERATION_PROJECT": missing_ids,
+    **{c: 0.0 for c in numeric_cols},
+})
+if "stack_height" in pad.columns:
+    pad["stack_height"] = "ground"
+gen_emission_costs = pd.concat([gen_emission_costs, pad], ignore_index=True)
+print(
+    f"[INFO] Padded {len(missing_ids):,} missing generators with zeros "
+    f"(non-emitters + coord-dropped); final row count: {len(gen_emission_costs):,}."
+)
+
+# Final sanity check against the on-disk gen_info, not the in-memory one
+assert len(gen_emission_costs) == len(all_gen_ids), (
+    f"gen_emission_costs row count ({len(gen_emission_costs):,}) "
+    f"does not match original gen_info ({len(all_gen_ids):,}). "
+    f"Switch will fail with index-validation errors."
+)
 
 out_emissions_file = input_path / "gen_emission_costs.csv"
+gen_emission_costs = gen_emission_costs.sort_values("GENERATION_PROJECT").reset_index(drop=True)
 gen_emission_costs.to_csv(out_emissions_file, index=False, na_rep='.')
 print(f"Saved {out_emissions_file} with {len(gen_emission_costs):,} rows.")
