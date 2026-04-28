@@ -183,7 +183,7 @@ dependencies:
   - libgoogle-cloud=2.8
   - libgrpc=1.52
   - libhwy=1.0
-  - libintl-devel=0.22
+  - libintl-devel=0.22.5
   - libjpeg-turbo=2.1.5
   - libjxl=0.8
   - liblapack=3.9
