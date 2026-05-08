@@ -88,7 +88,7 @@ The sweep is designed to handle SLURM time limits and worker crashes gracefully:
   PG_OUT_DIR=/path/to/job_12345 sbatch submit_sweep.slurm
   ```
 
-## Sending results back to Melek
+## Sending results back
 
 After the sweep completes:
 
@@ -122,4 +122,4 @@ The full per-cluster detail is preserved, so all downstream aggregation and plot
 
 ## Methodology summary (for the writeup)
 
-PowerGenome's renewable clustering pipeline (`powergenome.cluster.renewables.assign_site_cluster`) was called directly via its public API at each (region, technology, N) combination in the sweep. Reproduction was validated bit-exactly against PG's own saved cluster assignments (Adjusted Rand Index = 1.0). Within-cluster reconstruction RMSE was computed as the capacity-weighted root-mean-square deviation between each candidate project area's individual hourly capacity-factor profile and the capacity-weighted centroid of its assigned cluster, then aggregated across regions using capacity weights. Per-region cluster budgets were allocated using sqrt(capacity) weighting (Melek's `allocate_clusters` function with min_per_zone=1).
+PowerGenome's renewable clustering pipeline (`powergenome.cluster.renewables.assign_site_cluster`) was called directly via its public API at each (region, technology, N) combination in the sweep. Reproduction was validated bit-exactly against PG's own saved cluster assignments (Adjusted Rand Index = 1.0). Within-cluster reconstruction RMSE was computed as the capacity-weighted root-mean-square deviation between each candidate project area's individual hourly capacity-factor profile and the capacity-weighted centroid of its assigned cluster, then aggregated across regions using capacity weights. Per-region cluster budgets were allocated using sqrt(capacity) weighting (`allocate_clusters` function with min_per_zone=1).
