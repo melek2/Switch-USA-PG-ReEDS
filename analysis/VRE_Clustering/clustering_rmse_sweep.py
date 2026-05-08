@@ -52,9 +52,13 @@ os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
 # ----------------------------------------------------------------------------
 # Configurable paths
 # ----------------------------------------------------------------------------
-DEFAULT_REPO_ROOT = "/Users/melek/Documents/GitHub/Switch-USA-PG-ReEDS"
+# Default REPO_ROOT is computed relative to this script's location -- assumes
+# the script lives at ${REPO}/analysis/VRE_Clustering/clustering_rmse_sweep.py
+# (two levels up). Override with PG_REPO_ROOT env var if needed.
+_THIS_FILE = Path(__file__).resolve()
+_REPO_ROOT_FROM_SCRIPT = _THIS_FILE.parent.parent.parent  # script -> VRE_Clustering -> analysis -> repo
 
-REPO_ROOT     = Path(os.environ.get("PG_REPO_ROOT", DEFAULT_REPO_ROOT))
+REPO_ROOT     = Path(os.environ.get("PG_REPO_ROOT", _REPO_ROOT_FROM_SCRIPT))
 PROFILES_DIR  = Path(os.environ.get("PG_PROFILES_DIR", REPO_ROOT / "pg_data" / "profiles"))
 RG_DIR        = Path(os.environ.get("PG_RG_DIR",
                      REPO_ROOT / "pg" / "resource_groups_10weeks_7days_PROFILE_CLUSTERS" / "ReEDS-cpas-patched"))
