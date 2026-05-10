@@ -278,6 +278,13 @@ def run_sweep(grid: Tuple[int, ...], n_jobs: int, feature: str,
     (OUT_DIR / "grid.txt").write_text(" ".join(str(n) for n in grid))
     out_csv = OUT_DIR / f"per_cluster_rmse_{feature}.csv"
 
+    # If not resuming and the CSV already exists, blow it away. Otherwise we
+    # risk appending new-schema rows to an old-schema file, which pandas
+    # can't parse on read.
+    if not resume and out_csv.exists():
+        print(f"Removing existing {out_csv} (resume=False; otherwise schemas could mix)")
+        out_csv.unlink()
+
     print("=" * 64)
     print(f"Sweep config")
     print(f"  feature   : {feature}")
