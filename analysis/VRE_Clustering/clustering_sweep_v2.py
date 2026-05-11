@@ -64,7 +64,7 @@ PROFILES_DIR  = Path(os.environ.get("PG_PROFILES_DIR", REPO_ROOT / "pg_data" / "
 RG_DIR        = Path(os.environ.get("PG_RG_DIR",
                      REPO_ROOT / "pg" / "resource_groups_10weeks_7days_PROFILE_CLUSTERS" / "ReEDS-cpas-patched"))
 OUT_DIR       = Path(os.environ.get("PG_OUT_DIR",
-                     REPO_ROOT / "analysis" / "VRE_Clustering" / "sweep_v2"))
+                     REPO_ROOT / "analysis" / "VRE_Clustering" / "sweep_v2a"))
 
 
 # ----------------------------------------------------------------------------
