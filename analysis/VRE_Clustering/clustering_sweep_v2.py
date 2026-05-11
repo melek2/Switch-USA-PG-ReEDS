@@ -23,11 +23,12 @@ USAGE
   # Local CF test (~10 min):
   python clustering_sweep_v2.py --feature cf --n-jobs 4
 
-  # Local profile test (long; not recommended unless you have time):
-  python clustering_sweep_v2.py --feature profile --n-jobs 4
-
-  # HPC run:
+  # Independent tech sweeps (default: 1000, 1500, 2000, 2500 each):
   python clustering_sweep_v2.py --feature profile --n-jobs 60 --strict-jobs 16
+
+  # Custom per-tech grids:
+  python clustering_sweep_v2.py --feature profile --n-jobs 60 --strict-jobs 16 \
+      --n-solar 1500 2000 --n-wind 1000 1500 2000 2500
 
 ENV VARS (override defaults; defaults are repo-relative):
   PG_REPO_ROOT, PG_PROFILES_DIR, PG_RG_DIR, PG_OUT_DIR
@@ -82,8 +83,9 @@ TECHS: Dict[str, Dict] = {
     },
 }
 
-# Three N budgets, per advisor: 1000 (re-run with sqrt allocator), 2000, 3000
-DEFAULT_GRID = (1000, 2000, 3000)
+# Per-tech N grids (independent sweeps)
+DEFAULT_N_SOLAR = (1000, 1500, 2000, 2500)
+DEFAULT_N_WIND  = (1000, 1500, 2000, 2500)
 
 
 # ----------------------------------------------------------------------------
@@ -109,20 +111,7 @@ def allocate_clusters(cap, n_total, min_per_zone=1, max_sites=None):
     return alloc.astype(int)
 
 
-def split_total(total_n: int, capacities: Dict[str, float]) -> Dict[str, int]:
-    """Split total_n between techs by sqrt(capacity)."""
-    weights = {tech: math.sqrt(c) for tech, c in capacities.items()}
-    wsum = sum(weights.values())
-    raw = {tech: total_n * w / wsum for tech, w in weights.items()}
-    floor = {tech: int(math.floor(v)) for tech, v in raw.items()}
-    leftover = total_n - sum(floor.values())
-    for tech in sorted(raw, key=lambda t: -(raw[t] - floor[t])):
-        if leftover <= 0:
-            break
-        floor[tech] += 1
-        leftover -= 1
-    return floor
-
+# split_total removed: each tech now gets its own independent N grid.
 
 # ----------------------------------------------------------------------------
 # Per-region work: build linkage once, cut at multiple Ns, compute RMSE
@@ -269,18 +258,17 @@ def process_region(tech: str, region: str,
 # ----------------------------------------------------------------------------
 # Sweep driver
 # ----------------------------------------------------------------------------
-def run_sweep(grid: Tuple[int, ...], n_jobs: int, feature: str,
+def run_sweep(tech_grids: Dict[str, Tuple[int, ...]], n_jobs: int, feature: str,
               strict_jobs: int = 1, resume: bool = False):
     from joblib import Parallel, delayed
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    # Write the grid labels so plot_sweep_v2.py can map bucket_N back to total_n
-    (OUT_DIR / "grid.txt").write_text(" ".join(str(n) for n in grid))
+    # Write grid info for downstream plotters
+    grid_info = " | ".join(f"{t}:{','.join(str(n) for n in ns)}"
+                           for t, ns in tech_grids.items())
+    (OUT_DIR / "grid.txt").write_text(grid_info)
     out_csv = OUT_DIR / f"per_cluster_rmse_{feature}.csv"
 
-    # If not resuming and the CSV already exists, blow it away. Otherwise we
-    # risk appending new-schema rows to an old-schema file, which pandas
-    # can't parse on read.
     if not resume and out_csv.exists():
         print(f"Removing existing {out_csv} (resume=False; otherwise schemas could mix)")
         out_csv.unlink()
@@ -288,20 +276,18 @@ def run_sweep(grid: Tuple[int, ...], n_jobs: int, feature: str,
     print("=" * 64)
     print(f"Sweep config")
     print(f"  feature   : {feature}")
-    print(f"  N grid    : {grid}")
+    for tech, ns in tech_grids.items():
+        print(f"  N_{tech:14s}: {ns}")
     print(f"  n_jobs    : {n_jobs}  (strict floor: {strict_jobs})")
     print(f"  out_csv   : {out_csv}")
     print(f"  resume    : {resume}")
     print("=" * 64)
 
-    # FAIL LOUDLY if n_jobs is below the strict floor
     if n_jobs < strict_jobs:
         print(f"\nERROR: n_jobs={n_jobs} is below strict floor of {strict_jobs}.")
-        print(f"This usually means nproc is wrong on this node, or the env var didn't propagate.")
         print(f"Pass --n-jobs explicitly. Aborting.")
         sys.exit(2)
 
-    # Load metadata + site maps (small)
     print("Loading tech metadata...")
     metadata, site_maps = {}, {}
     for tech, cfg in TECHS.items():
@@ -314,25 +300,25 @@ def run_sweep(grid: Tuple[int, ...], n_jobs: int, feature: str,
         print(f"  {tech}: {len(md):,} CPAs, {md['region'].nunique()} regions, "
               f"{md['mw'].sum()/1e3:,.1f} GW")
 
-    # For each (tech, region), collect a list of (N, total_n_label) pairs.
-    # Different total_n buckets may yield the SAME N for a small region (because
-    # of min_per_zone clamping); we keep both entries so each total_n appears
-    # once in the output, even if its N collides with another bucket's.
+    # For each (tech, region), collect (N_for_region, N_tech_label) pairs.
+    # Each tech has its own grid of N values. For each N in the grid, we
+    # distribute that N across regions using sqrt(capacity) allocation.
+    # The label (total_n) is the per-tech N, NOT a combined solar+wind total.
     region_pairs: Dict[Tuple[str, str], List[Tuple[int, int]]] = {}
-    capacities = {tech: metadata[tech]["mw"].sum() for tech in TECHS}
-    for total_n in grid:
-        n_per_tech = split_total(total_n, capacities)
-        for tech, n_tech in n_per_tech.items():
-            cap_by_region = metadata[tech].groupby("region")["mw"].sum()
+    for tech, grid in tech_grids.items():
+        cap_by_region = metadata[tech].groupby("region")["mw"].sum()
+        n_sites_by_region = metadata[tech].groupby("region").size()
+        for n_tech in grid:
             try:
-                alloc = allocate_clusters(cap_by_region, n_tech)
+                alloc = allocate_clusters(cap_by_region, n_tech,
+                                          max_sites=n_sites_by_region)
             except ValueError as e:
-                print(f"  WARN: alloc failed for total_n={total_n}/{tech}: {e}")
+                print(f"  WARN: alloc failed for {tech} N={n_tech}: {e}")
                 continue
             for region, n in alloc.items():
-                region_pairs.setdefault((tech, region), []).append((int(n), int(total_n)))
-            print(f"  total_n={total_n}: {tech} -> {n_tech} clusters, "
-                  f"{len(alloc)} regions, range [{alloc.min()}, {alloc.max()}]")
+                region_pairs.setdefault((tech, region), []).append((int(n), int(n_tech)))
+            print(f"  {tech:14s} N={n_tech}: {len(alloc)} regions, "
+                  f"range [{alloc.min()}, {alloc.max()}]")
 
     # Resume support
     if resume and out_csv.exists():
@@ -408,10 +394,19 @@ def main():
                         help="Parallel workers. Pass explicitly to avoid nproc surprises.")
     parser.add_argument("--strict-jobs", type=int, default=1,
                         help="Abort if n_jobs is below this. Use 16+ on HPC.")
-    parser.add_argument("--grid", type=int, nargs="+", default=list(DEFAULT_GRID))
+    parser.add_argument("--n-solar", type=int, nargs="+",
+                        default=list(DEFAULT_N_SOLAR),
+                        help="N values to sweep for solar (default: %(default)s)")
+    parser.add_argument("--n-wind", type=int, nargs="+",
+                        default=list(DEFAULT_N_WIND),
+                        help="N values to sweep for wind (default: %(default)s)")
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
-    run_sweep(tuple(args.grid), args.n_jobs, args.feature,
+    tech_grids = {
+        "solar": tuple(sorted(args.n_solar)),
+        "onshorewind": tuple(sorted(args.n_wind)),
+    }
+    run_sweep(tech_grids, args.n_jobs, args.feature,
               strict_jobs=args.strict_jobs, resume=args.resume)
 
 
