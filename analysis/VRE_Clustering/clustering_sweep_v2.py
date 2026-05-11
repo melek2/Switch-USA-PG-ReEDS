@@ -2,33 +2,45 @@
 clustering_sweep_v2.py
 ======================
 Compute within-cluster reconstruction RMSE for renewable site clustering at
-three N budgets: 1000, 2000, 3000. Per-zone breakdown so the full distribution
-of cluster RMSEs is visible, not just an aggregate.
+multiple per-tech N values. Per-zone breakdown so the full distribution of
+cluster RMSEs is visible, not just an aggregate.
 
-ARCHITECTURE (different from v1):
+INDEPENDENT PER-TECH BUDGETS (vs prior single shared budget):
+Each tech gets its own N values, paired by position into "runs". Run i uses
+N_SOLAR[i] solar clusters and N_WIND[i] wind clusters. No sqrt(capacity)
+split between techs — they're allocated independently. This matters because
+wind profiles are more diverse than solar per unit capacity, so a capacity-
+weighted split systematically under-allocates wind.
+
+ARCHITECTURE:
 For each (region, tech) pair, build the agglomerative ward linkage tree ONCE
-using scipy.cluster.hierarchy.linkage. Then cut at each N budget using
-fcluster -- which is essentially free. This means:
+using scipy.cluster.hierarchy.linkage. Then cut at each run's N using
+fcluster -- which is essentially free.
   - Linkage cost: O(n^2 log n) per region, paid ONCE
-  - Cut cost: O(n) per N value, paid 3 times
-This is mathematically identical to sklearn's AgglomerativeClustering at each
-cut point (both implement Lance-Williams ward).
+  - Cut cost: O(n) per N value, paid once per run
 
-DOES "FEATURE" CHANGE THIS?
+FEATURE MODES:
   - feature='profile' -> linkage on full hourly CF vectors (61320 dims)
-  - feature='cf'      -> linkage on annual mean CF (1 dim)
-The CF mode is provided for FAST LOCAL TESTING. Production runs use 'profile'.
+  - feature='cf'      -> linkage on annual mean CF (1 dim, for fast testing)
 
 USAGE
   # Local CF test (~10 min):
   python clustering_sweep_v2.py --feature cf --n-jobs 4
 
-  # Independent tech sweeps (default: 1000, 1500, 2000, 2500 each):
+  # Default: 4 runs at 1000, 1500, 2000, 2500 for both techs
   python clustering_sweep_v2.py --feature profile --n-jobs 60 --strict-jobs 16
 
-  # Custom per-tech grids:
+  # Solar fixed, wind sweep:
   python clustering_sweep_v2.py --feature profile --n-jobs 60 --strict-jobs 16 \
-      --n-solar 1500 2000 --n-wind 1000 1500 2000 2500
+      --n-solar 1500 --n-wind 1000 1500 2000 2500
+
+OUTPUT
+  Each row in per_cluster_rmse_<feature>.csv now has:
+    - tech, region, cluster (identity)
+    - run_idx, n_solar, n_wind (which run this row came from)
+    - total_n: per-tech N for that run (= n_solar for solar rows, n_wind for wind)
+    - N_total_for_region: actual cluster count this region got
+    - RMSE stats, interconnect cost stats
 
 ENV VARS (override defaults; defaults are repo-relative):
   PG_REPO_ROOT, PG_PROFILES_DIR, PG_RG_DIR, PG_OUT_DIR
@@ -83,9 +95,11 @@ TECHS: Dict[str, Dict] = {
     },
 }
 
-# Per-tech N grids (independent sweeps)
+# Default per-tech N values, paired by position into "runs".
+# Run i uses N_SOLAR[i] solar clusters and N_WIND[i] wind clusters.
 DEFAULT_N_SOLAR = (1000, 1500, 2000, 2500)
 DEFAULT_N_WIND  = (1000, 1500, 2000, 2500)
+TECH_BY_KEY = {"solar": "solar", "wind": "onshorewind"}  # CLI key -> internal name
 
 
 # ----------------------------------------------------------------------------
@@ -111,8 +125,6 @@ def allocate_clusters(cap, n_total, min_per_zone=1, max_sites=None):
     return alloc.astype(int)
 
 
-# split_total removed: each tech now gets its own independent N grid.
-
 # ----------------------------------------------------------------------------
 # Per-region work: build linkage once, cut at multiple Ns, compute RMSE
 # ----------------------------------------------------------------------------
@@ -121,24 +133,26 @@ def process_region(tech: str, region: str,
                    site_map: pd.Series,
                    n_clusters_list: List[int],
                    total_n_labels: List[int],
+                   run_meta: List[Dict[str, int]],
                    feature: str = "profile") -> List[Dict]:
     """
     For one (tech, region):
       1. Pull all CPAs in this region
       2. Load each CPA's profile (or compute its annual mean CF)
       3. Build agglomerative ward linkage (ONCE)
-      4. For each (N, total_n_label) pair:
+      4. For each (N, total_n_label, run_meta) triple:
          - Cut the linkage at N
          - For each resulting cluster, compute the RMSE of every member CPA
            against the cluster's capacity-weighted centroid profile
-         - Save per-cluster summary
+         - Save per-cluster summary tagged with run metadata (n_solar, n_wind, run_idx)
     Returns a list of dicts -- one per (region, N, cluster).
 
-    n_clusters_list and total_n_labels must have the same length.
+    n_clusters_list, total_n_labels, run_meta must all have the same length.
+    Each run_meta dict has keys 'run_idx', 'n_solar', 'n_wind'.
     """
     from scipy.cluster.hierarchy import linkage, fcluster
-    assert len(n_clusters_list) == len(total_n_labels), \
-        "n_clusters_list and total_n_labels must align"
+    assert len(n_clusters_list) == len(total_n_labels) == len(run_meta), \
+        "n_clusters_list, total_n_labels, run_meta must align"
 
     renew_data = metadata[metadata["region"] == region].copy()
     renew_data = renew_data.rename(columns={"capacity_mw": "mw"}) if "mw" not in renew_data.columns else renew_data
@@ -184,7 +198,13 @@ def process_region(tech: str, region: str,
     Z = linkage(feat, method="ward")
 
     rows = []
-    for N, total_n_label in zip(n_clusters_list, total_n_labels):
+    for N, total_n_label, run in zip(n_clusters_list, total_n_labels, run_meta):
+        run_cols = {
+            "total_n": total_n_label,
+            "run_idx": int(run["run_idx"]),
+            "n_solar": int(run["n_solar"]),
+            "n_wind": int(run["n_wind"]),
+        }
         if N >= len(valid_cpas):
             # Each CPA its own cluster -> RMSE = 0
             for i, cpa in enumerate(valid_cpas):
@@ -192,7 +212,7 @@ def process_region(tech: str, region: str,
                 ic = float(ic_val) if not np.isnan(ic_val) else None
                 rows.append({
                     "tech": tech, "region": region,
-                    "total_n": total_n_label,
+                    **run_cols,
                     "N_total_for_region": N,
                     "cluster": i, "n_members": 1,
                     "cluster_cap_mw": float(cpa_caps[i]),
@@ -238,7 +258,7 @@ def process_region(tech: str, region: str,
 
             rows.append({
                 "tech": tech, "region": region,
-                "total_n": total_n_label,
+                **run_cols,
                 "N_total_for_region": N,
                 "cluster": int(cluster_id) - 1,
                 "n_members": int(mask.sum()),
@@ -258,17 +278,33 @@ def process_region(tech: str, region: str,
 # ----------------------------------------------------------------------------
 # Sweep driver
 # ----------------------------------------------------------------------------
-def run_sweep(tech_grids: Dict[str, Tuple[int, ...]], n_jobs: int, feature: str,
+def run_sweep(n_solar: Tuple[int, ...], n_wind: Tuple[int, ...],
+              n_jobs: int, feature: str,
               strict_jobs: int = 1, resume: bool = False):
     from joblib import Parallel, delayed
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    # Write grid info for downstream plotters
-    grid_info = " | ".join(f"{t}:{','.join(str(n) for n in ns)}"
-                           for t, ns in tech_grids.items())
-    (OUT_DIR / "grid.txt").write_text(grid_info)
-    out_csv = OUT_DIR / f"per_cluster_rmse_{feature}.csv"
+    # Pair n_solar and n_wind by position into runs. Broadcast length-1.
+    if len(n_solar) == 1 and len(n_wind) > 1:
+        n_solar = n_solar * len(n_wind)
+    elif len(n_wind) == 1 and len(n_solar) > 1:
+        n_wind = n_wind * len(n_solar)
+    if len(n_solar) != len(n_wind):
+        raise ValueError(
+            f"--n-solar ({len(n_solar)} values) and --n-wind ({len(n_wind)} values) "
+            f"must have the same length, or one must be length-1 (to broadcast)."
+        )
 
+    runs = [{"run_idx": i, "n_solar": int(s), "n_wind": int(w)}
+            for i, (s, w) in enumerate(zip(n_solar, n_wind))]
+
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    # grid.txt now records the per-tech runs explicitly
+    grid_lines = ["run_idx,n_solar,n_wind"]
+    for r in runs:
+        grid_lines.append(f"{r['run_idx']},{r['n_solar']},{r['n_wind']}")
+    (OUT_DIR / "grid.txt").write_text("\n".join(grid_lines))
+
+    out_csv = OUT_DIR / f"per_cluster_rmse_{feature}.csv"
     if not resume and out_csv.exists():
         print(f"Removing existing {out_csv} (resume=False; otherwise schemas could mix)")
         out_csv.unlink()
@@ -276,8 +312,9 @@ def run_sweep(tech_grids: Dict[str, Tuple[int, ...]], n_jobs: int, feature: str,
     print("=" * 64)
     print(f"Sweep config")
     print(f"  feature   : {feature}")
-    for tech, ns in tech_grids.items():
-        print(f"  N_{tech:14s}: {ns}")
+    print(f"  runs      :")
+    for r in runs:
+        print(f"    run {r['run_idx']}: n_solar={r['n_solar']}, n_wind={r['n_wind']}")
     print(f"  n_jobs    : {n_jobs}  (strict floor: {strict_jobs})")
     print(f"  out_csv   : {out_csv}")
     print(f"  resume    : {resume}")
@@ -285,6 +322,7 @@ def run_sweep(tech_grids: Dict[str, Tuple[int, ...]], n_jobs: int, feature: str,
 
     if n_jobs < strict_jobs:
         print(f"\nERROR: n_jobs={n_jobs} is below strict floor of {strict_jobs}.")
+        print(f"This usually means nproc is wrong on this node, or the env var didn't propagate.")
         print(f"Pass --n-jobs explicitly. Aborting.")
         sys.exit(2)
 
@@ -300,25 +338,25 @@ def run_sweep(tech_grids: Dict[str, Tuple[int, ...]], n_jobs: int, feature: str,
         print(f"  {tech}: {len(md):,} CPAs, {md['region'].nunique()} regions, "
               f"{md['mw'].sum()/1e3:,.1f} GW")
 
-    # For each (tech, region), collect (N_for_region, N_tech_label) pairs.
-    # Each tech has its own grid of N values. For each N in the grid, we
-    # distribute that N across regions using sqrt(capacity) allocation.
-    # The label (total_n) is the per-tech N, NOT a combined solar+wind total.
-    region_pairs: Dict[Tuple[str, str], List[Tuple[int, int]]] = {}
-    for tech, grid in tech_grids.items():
-        cap_by_region = metadata[tech].groupby("region")["mw"].sum()
-        n_sites_by_region = metadata[tech].groupby("region").size()
-        for n_tech in grid:
+    # For each (tech, region), collect a list of (N, total_n_label, run_meta) triples.
+    # Per-tech: each run gets its OWN N (no more sqrt-splitting of a single total).
+    region_pairs: Dict[Tuple[str, str], List[Tuple[int, int, Dict]]] = {}
+    tech_key_map = {"solar": "n_solar", "onshorewind": "n_wind"}
+    for run in runs:
+        for tech in TECHS:
+            n_tech = run[tech_key_map[tech]]
+            cap_by_region = metadata[tech].groupby("region")["mw"].sum()
             try:
-                alloc = allocate_clusters(cap_by_region, n_tech,
-                                          max_sites=n_sites_by_region)
+                alloc = allocate_clusters(cap_by_region, n_tech)
             except ValueError as e:
-                print(f"  WARN: alloc failed for {tech} N={n_tech}: {e}")
+                print(f"  WARN: alloc failed for run {run['run_idx']}/{tech} (N={n_tech}): {e}")
                 continue
             for region, n in alloc.items():
-                region_pairs.setdefault((tech, region), []).append((int(n), int(n_tech)))
-            print(f"  {tech:14s} N={n_tech}: {len(alloc)} regions, "
-                  f"range [{alloc.min()}, {alloc.max()}]")
+                region_pairs.setdefault((tech, region), []).append(
+                    (int(n), int(n_tech), dict(run))
+                )
+            print(f"  run {run['run_idx']} ({tech}): {n_tech} clusters, "
+                  f"{len(alloc)} regions, range [{alloc.min()}, {alloc.max()}]")
 
     # Resume support
     if resume and out_csv.exists():
@@ -329,32 +367,31 @@ def run_sweep(tech_grids: Dict[str, Tuple[int, ...]], n_jobs: int, feature: str,
         region_pairs = {k: v for k, v in region_pairs.items() if k not in done_keys}
         print(f"Resume: {before - len(region_pairs)} (tech, region) tasks already done")
 
-    # Build task list: (tech, region, [Ns sorted by their total_n], [total_n labels in same order])
+    # Build task list: (tech, region, [Ns], [total_n labels], [run_meta dicts])
     tasks = []
-    for (tech, region), pairs in region_pairs.items():
-        # Sort by total_n so the linkage cuts go in a sensible order (small to large)
-        pairs_sorted = sorted(pairs, key=lambda p: p[1])
-        ns        = [p[0] for p in pairs_sorted]
-        labels    = [p[1] for p in pairs_sorted]
-        tasks.append((tech, region, ns, labels))
+    for (tech, region), triples in region_pairs.items():
+        triples_sorted = sorted(triples, key=lambda t: t[1])  # sort by total_n_label
+        ns     = [t[0] for t in triples_sorted]
+        labels = [t[1] for t in triples_sorted]
+        rmeta  = [t[2] for t in triples_sorted]
+        tasks.append((tech, region, ns, labels, rmeta))
 
-    # Sort by region size descending so big jobs start early
     region_sizes = {(t, r): (metadata[t]["region"] == r).sum() for t, r in region_pairs}
     tasks.sort(key=lambda x: -region_sizes.get((x[0], x[1]), 0))
 
     print(f"\nDispatching {len(tasks)} (tech, region) jobs to {n_jobs} workers")
     print(f"Largest 5 regions:")
-    for t, r, ns, labels in tasks[:5]:
-        pretty = ", ".join(f"N={n} (total_n={l})" for n, l in zip(ns, labels))
+    for t, r, ns, labels, rmeta in tasks[:5]:
+        pretty = ", ".join(f"N={n} (run {rm['run_idx']})" for n, rm in zip(ns, rmeta))
         print(f"  {t:14s} {r:35s} {region_sizes[(t,r)]:>6} CPAs, [{pretty}]")
 
-    def _wrap(tech, region, ns, labels):
+    def _wrap(tech, region, ns, labels, rmeta):
         try:
             t0 = time.time()
             result = process_region(
                 tech, region, metadata[tech],
                 PROFILES_DIR / TECHS[tech]["profiles"],
-                site_maps[tech], ns, labels, feature=feature,
+                site_maps[tech], ns, labels, rmeta, feature=feature,
             )
             elapsed = time.time() - t0
             return {"ok": True, "tech": tech, "region": region,
@@ -364,11 +401,10 @@ def run_sweep(tech_grids: Dict[str, Tuple[int, ...]], n_jobs: int, feature: str,
             return {"ok": False, "tech": tech, "region": region,
                     "tb": traceback.format_exc()}
 
-    # Stream results to CSV as each region completes
     write_header = not (resume and out_csv.exists())
     n_done, n_err = 0, 0
     with Parallel(n_jobs=n_jobs, return_as="generator", verbose=10) as parallel:
-        for res in parallel(delayed(_wrap)(t[0], t[1], t[2], t[3]) for t in tasks):
+        for res in parallel(delayed(_wrap)(t[0], t[1], t[2], t[3], t[4]) for t in tasks):
             if res["ok"]:
                 df = pd.DataFrame(res["rows"])
                 df.to_csv(out_csv, mode="a", header=write_header, index=False)
@@ -396,17 +432,14 @@ def main():
                         help="Abort if n_jobs is below this. Use 16+ on HPC.")
     parser.add_argument("--n-solar", type=int, nargs="+",
                         default=list(DEFAULT_N_SOLAR),
-                        help="N values to sweep for solar (default: %(default)s)")
+                        help="N for solar in each run. Default: 1000 1500 2000 2500.")
     parser.add_argument("--n-wind", type=int, nargs="+",
                         default=list(DEFAULT_N_WIND),
-                        help="N values to sweep for wind (default: %(default)s)")
+                        help="N for wind in each run. Default: 1000 1500 2000 2500. "
+                             "Must match --n-solar length, or be length-1 (broadcast).")
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
-    tech_grids = {
-        "solar": tuple(sorted(args.n_solar)),
-        "onshorewind": tuple(sorted(args.n_wind)),
-    }
-    run_sweep(tech_grids, args.n_jobs, args.feature,
+    run_sweep(tuple(args.n_solar), tuple(args.n_wind), args.n_jobs, args.feature,
               strict_jobs=args.strict_jobs, resume=args.resume)
 
 
