@@ -1,0 +1,8 @@
+{
+    "technology": "offshorewind",
+    "metadata": "offshorewind_lcoe_ReEDS.csv",
+    "profiles": "offshorewind_rev_profiles_20240801.parquet",
+    "site_map": "offshorewind_site_mapping_20240801.parquet",
+    "turbine_type": "fixed",
+    "pref_site": 0
+}
