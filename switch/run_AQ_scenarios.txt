@@ -1,5 +1,5 @@
 # AQ SCENARIOS
-# BAU CASE (Time sampled at N=6, profile clustered)
+# BAU CASE (Time sampled at N=2, profile clustered)
 --scenario-name BAU_2035 --inputs-dir in_AQ/2035/AQ_s10x7_N2 --outputs-dir out_AQ/2035/BAU --module-list modules_BAU.txt --include-module study_modules.prepare_next_stage --logs-dir out_AQ/2035/BAU/logs
 --scenario-name BAU_2050 --inputs-dir in_AQ/2050/AQ_s10x7_N2 --outputs-dir out_AQ/2050/BAU --input-aliases gen_build_predetermined.csv=gen_build_predetermined.chained.BAU.csv gen_build_costs.csv=gen_build_costs.chained.BAU.csv transmission_lines.csv=transmission_lines.chained.BAU.csv --module-list modules_BAU.txt --logs-dir out_AQ/2050/BAU/logs
 # 1A 25% Decarbonization
