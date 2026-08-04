@@ -24,6 +24,17 @@ Runs as part of `model_adjustment_scripts` (or standalone). Passes:
   can construct ZoneTotalCentralDispatch. Placeholder; real ATB parasitic
   loads belong upstream.
 
+* Manual coordinate patch: fills missing latitude / longitude in gen_info.csv
+  and candidate_sites.csv for a small set of plant_id_eia values whose
+  coordinates are absent from PUDL.  Sources documented in MANUAL_COORDS.
+
+* Coordinate error fix: overwrites known-bad coordinates (and optionally
+  gen_load_zone) for plant_id_eia values in COORD_OVERRIDES where PUDL has
+  a coordinate but it is factually wrong (e.g. sign-flipped longitude, or
+  plant placed at a completely different facility).  Also renames
+  GENERATION_PROJECT entries whose zone prefix becomes stale after a zone
+  reassignment.  Sources documented in COORD_OVERRIDES.
+
 * Hydro min-flow clipping: clips hydro_min_flow_mw in hydro_timeseries.csv
   to (total predetermined capacity x gen_availability) for any project
   where aggregated min-flow exceeds the feasible dispatch ceiling. Prevents
@@ -37,6 +48,16 @@ CLI:
 
     If --reeds-inputs is omitted, the script looks for bundled data at
     adjust/adjust_data/reeds_data/ (relative to this script).
+Missing coordinates:
+   plant_id_eia 675 28.0797, -81.9228   https://www.gem.wiki/Larsen_Memorial_power_station
+   plant_id_eia 955 41.371729 -89.12833 https://www.gem.wiki/Larsen_Memorial_power_station
+   plant_id_eia 56610 44.396150, -96.535018 https://www.google.com/maps/place/Deer+Creek+Station,+Basin+Electric+Power+Cooperative/@44.3949283,-96.5353042,1169m/data=!3m1!1e3!4m6!3m5!1s0x87898f052065472d:0x81f311bfa7c67702!8m2!3d44.3945351!4d-96.5261797!16s%2Fg%2F11css6tvrg?hl=en-US&entry=ttu&g_ep=EgoyMDI2MDUyMC4wIKXMDSoASAFQAw%3D%3D
+   plant_id_eia 6120 48.88564, -122.75164 https://www.gridinfo.com/plant/whitehorn/6120
+   plant_id_eia 14840 41.371729 -89.12833 https://www.interconnection.fyi/eia/project/68751-17
+
+Overwritten coordinates (coordinates are actually wrong)
+    plant_id_eia 50973 29.888462 -93.95098 (LA_and_e_TX_natural_gas_fired_combined_cycle_12-16, LA_and_e_TX_natural_gas_fired_combustion_turbine_24) https://www.interconnection.fyi/eia/project/50973-gn42
+    plant_id_eia 65768 42.2747 -71.7172 (MA_natural_gas_internal_combustion_engine_23, renamed from LAX via GEN_PROJECT_RENAMES) https://www.interconnection.fyi/eia/project/6125-4
 
 Settings YAML usage (out_folder is prepended by model_adjustment_scripts):
     Clean inputs:
@@ -186,6 +207,254 @@ def enrich_gen_info(out_folder: Path, pudl_db_path: Path, extra_outputs: Path | 
         f"[enrich] wrote {gen_info_path.name} ({n_matched}/{len(enriched)} matched "
         f"to existing units) and {candidates_path.name} ({len(candidates)} candidates)."
     )
+
+
+# ---------------------------------------------------------------------------
+# Manual coordinate patch
+# ---------------------------------------------------------------------------
+#
+# A small number of plants have valid plant_id_eia values but no coordinates
+# in the PUDL plants_entity_eia table (or the upstream data was null).  Rather
+# than patching PUDL, we keep a versioned override dict here.  Sources are
+# recorded as comments for reproducibility.
+#
+# Keys   : plant_id_eia (int)
+# Values : (latitude, longitude)
+
+MANUAL_COORDS: dict[int, tuple[float, float]] = {
+    675:   (28.079700,  -81.922800),   # https://www.gem.wiki/Larsen_Memorial_power_station
+    955:   (41.371729,  -89.128330),   # https://www.gem.wiki/Larsen_Memorial_power_station
+    56610: (44.396150,  -96.535018),   # https://www.google.com/maps/place/Deer+Creek+Station
+    6120:  (48.885640, -122.751640),   # https://www.gridinfo.com/plant/whitehorn/6120
+    14840: (41.371729,  -89.12833),   # https://www.interconnection.fyi/eia/project/68751-17
+}
+
+COORD_TARGET_FILES = (
+    "gen_info.csv",
+    "candidate_sites.csv",
+)
+
+
+def patch_missing_coordinates(out_folder: Path) -> None:
+    """Fill missing latitude / longitude in gen_info.csv and candidate_sites.csv
+    for plant_id_eia values listed in MANUAL_COORDS.
+
+    Only rows where *both* latitude and longitude are NaN / '.' are updated;
+    rows that already have coordinates are left untouched.  All rows sharing
+    a given plant_id_eia (there may be several cluster rows) are patched.
+    """
+    for fname in COORD_TARGET_FILES:
+        path = out_folder / fname
+        if not path.exists():
+            continue
+
+        df = pd.read_csv(path, dtype=str, keep_default_na=False)
+
+        if "plant_id_eia" not in df.columns:
+            logger.info(f"[coords] {fname}: no plant_id_eia column, skipping.")
+            continue
+        if "latitude" not in df.columns or "longitude" not in df.columns:
+            logger.info(f"[coords] {fname}: latitude/longitude columns missing, skipping.")
+            continue
+
+        # Normalise: treat '.' and '' as missing for the coordinate columns.
+        def _is_missing(series: pd.Series) -> pd.Series:
+            return series.str.strip().eq(".") | series.str.strip().eq("")
+
+        n_patched = 0
+        for plant_id, (lat, lon) in MANUAL_COORDS.items():
+            plant_mask = pd.to_numeric(df["plant_id_eia"], errors="coerce") == plant_id
+            coord_missing = _is_missing(df["latitude"]) | _is_missing(df["longitude"])
+            mask = plant_mask & coord_missing
+            n = int(mask.sum())
+            if n == 0:
+                if plant_mask.any():
+                    logger.info(
+                        f"[coords] {fname}: plant_id_eia {plant_id} – "
+                        f"coordinates already present, skipping."
+                    )
+                continue
+            df.loc[mask, "latitude"]  = str(lat)
+            df.loc[mask, "longitude"] = str(lon)
+            n_patched += n
+            logger.info(
+                f"[coords] {fname}: plant_id_eia {plant_id} – "
+                f"filled {n} row(s) with ({lat}, {lon})."
+            )
+
+        if n_patched == 0:
+            logger.info(f"[coords] {fname}: no missing coordinates to patch.")
+            continue
+
+        df.to_csv(path, index=False)
+        logger.info(f"[coords] {fname}: wrote {n_patched} coordinate patch(es).")
+
+
+# ---------------------------------------------------------------------------
+# Coordinate and zone overrides (wrong coordinates in upstream EIA/PUDL data)
+# ---------------------------------------------------------------------------
+#
+# Distinct from MANUAL_COORDS (which fills *missing* coordinates): these
+# entries overwrite coordinates that exist in PUDL but are factually wrong,
+# and optionally reassign gen_load_zone when the plant belongs to a different
+# region than its GENERATION_PROJECT name implies.
+#
+# Keys   : plant_id_eia (int)
+# Values : (latitude, longitude, new_gen_load_zone_or_None)
+#          new_gen_load_zone=None means keep existing zone assignment.
+#
+# Sources:
+#   50973 – coords landed at -76.4 lon (Atlantic Ocean); correct location is
+#            Cameron Parish, LA.  https://www.interconnection.fyi/eia/project/50973-gn42
+#   65768 – coords landed in MA but plant was assigned to LAX region; correct
+#            location and zone is MA.  https://www.interconnection.fyi/eia/project/6125-4
+
+COORD_OVERRIDES: dict[int, tuple[float, float, str | None]] = {
+    50973: (29.888462, -93.950980, None),  # LA_and_e_TX CC/CT; lon was ~-76 (Atlantic)
+    65768: (42.274700, -71.717200, "MA"),  # assigned to LAX but plant is in MA
+}
+
+# ---------------------------------------------------------------------------
+# Generator project renames
+# ---------------------------------------------------------------------------
+#
+# fix_coordinate_errors renames GENERATION_PROJECT in gen_info.csv and
+# candidate_sites.csv when a zone reassignment changes the zone prefix, but
+# the new name must also propagate to every other CSV that references the
+# generator (gen_build_costs.csv, gen_build_predetermined.csv,
+# gen_emission_costs.csv, gen_retirement_costs.csv, gen_storage_info.csv,
+# hydro_timeseries.csv, etc.).
+#
+# GEN_PROJECT_RENAMES maps old_name -> new_name.  fix_gen_project_renames
+# does a literal text replace across all *.csv files in the case folder so
+# no file is left with a stale generator name.
+#
+# Keys are derived from COORD_OVERRIDES zone reassignments; update both
+# together when adding a new plant override.
+#
+# Sources:
+#   LAX -> MA for plant_id_eia 65768: plant is physically in MA; zone prefix
+#   was wrong.  https://www.interconnection.fyi/eia/project/6125-4
+
+GEN_PROJECT_RENAMES: dict[str, str] = {
+    "LAX_natural_gas_internal_combustion_engine_23":
+        "MA_natural_gas_internal_combustion_engine_23",
+}
+
+
+def fix_coordinate_errors(out_folder: Path) -> None:
+    """Overwrite known-bad coordinates (and optionally gen_load_zone) in
+    gen_info.csv and candidate_sites.csv for plant_id_eia values listed in
+    COORD_OVERRIDES.  Unlike patch_missing_coordinates, this always overwrites
+    regardless of whether coordinates are already present.
+
+    Also renames GENERATION_PROJECT entries whose zone prefix no longer matches
+    after a zone reassignment (e.g. LAX_... -> MA_... when zone changes to MA).
+    """
+    for fname in COORD_TARGET_FILES:
+        path = out_folder / fname
+        if not path.exists():
+            continue
+
+        df = pd.read_csv(path, dtype=str, keep_default_na=False)
+
+        if "plant_id_eia" not in df.columns:
+            logger.info(f"[coord-fix] {fname}: no plant_id_eia column, skipping.")
+            continue
+        if "latitude" not in df.columns or "longitude" not in df.columns:
+            logger.info(f"[coord-fix] {fname}: latitude/longitude columns missing, skipping.")
+            continue
+
+        eid = pd.to_numeric(df["plant_id_eia"], errors="coerce")
+        n_patched_total = 0
+
+        for plant_id, (lat, lon, new_zone) in COORD_OVERRIDES.items():
+            mask = eid == plant_id
+            n = int(mask.sum())
+            if n == 0:
+                continue
+
+            df.loc[mask, "latitude"]  = str(lat)
+            df.loc[mask, "longitude"] = str(lon)
+            zone_msg = "zone unchanged"
+
+            if new_zone is not None and "gen_load_zone" in df.columns:
+                old_zones = df.loc[mask, "gen_load_zone"].unique().tolist()
+                df.loc[mask, "gen_load_zone"] = new_zone
+                zone_msg = f"zone {old_zones} -> {new_zone}"
+
+                # Rename GENERATION_PROJECT prefix if it starts with an old zone
+                if "GENERATION_PROJECT" in df.columns:
+                    for old_zone in old_zones:
+                        prefix_mask = (
+                            mask
+                            & df["GENERATION_PROJECT"].str.startswith(old_zone + "_")
+                        )
+                        if prefix_mask.any():
+                            df.loc[prefix_mask, "GENERATION_PROJECT"] = (
+                                df.loc[prefix_mask, "GENERATION_PROJECT"]
+                                .str.replace(f"^{old_zone}_", f"{new_zone}_", regex=True)
+                            )
+                            n_renamed = int(prefix_mask.sum())
+                            logger.info(
+                                f"[coord-fix] {fname}: plant_id_eia {plant_id} – "
+                                f"renamed {n_renamed} GENERATION_PROJECT(s) "
+                                f"{old_zone}_... -> {new_zone}_..."
+                            )
+
+            logger.info(
+                f"[coord-fix] {fname}: plant_id_eia {plant_id} – "
+                f"overwrote coords for {n} row(s) with ({lat}, {lon}), {zone_msg}."
+            )
+            n_patched_total += n
+
+        if n_patched_total == 0:
+            logger.info(f"[coord-fix] {fname}: no coordinate overrides to apply.")
+            continue
+
+        df.to_csv(path, index=False)
+        logger.info(f"[coord-fix] {fname}: wrote {n_patched_total} override(s).")
+
+
+def fix_gen_project_renames(out_folder: Path) -> None:
+    """Propagate GENERATION_PROJECT renames from GEN_PROJECT_RENAMES across
+    all *.csv files in the case folder.
+
+    fix_coordinate_errors renames GENERATION_PROJECT in gen_info.csv and
+    candidate_sites.csv, but the new name must also reach every other file
+    that references the generator (gen_build_costs.csv, gen_emission_costs.csv,
+    gen_build_predetermined.csv, gen_retirement_costs.csv, hydro_timeseries.csv,
+    etc.).  This function does a literal text replace so no file is missed.
+    """
+    if not GEN_PROJECT_RENAMES:
+        return
+
+    csvs = list(out_folder.glob("*.csv"))
+    # Also catch cerf sited outputs and other subdirectory CSVs.
+    csvs += [p for p in out_folder.rglob("**/*.csv") if p not in csvs]
+
+    for path in csvs:
+        try:
+            text = path.read_text()
+        except Exception as e:
+            logger.warning(f"[gen-rename] could not read {path.name}: {e}")
+            continue
+
+        total = 0
+        for old, new in GEN_PROJECT_RENAMES.items():
+            n = text.count(old)
+            if n:
+                text = text.replace(old, new)
+                total += n
+
+        if total == 0:
+            continue
+
+        path.write_text(text)
+        logger.info(
+            f"[gen-rename] {path.relative_to(out_folder)}: "
+            f"replaced {total} generator name(s)."
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -497,9 +766,49 @@ BIO_FUEL_NAME = "waste_biomass"
 BIO_ENERGY_CONTENT = 13.0
 BIO_SW_SUPPLY = 1.0
 BIO_SW_TRANSPORT_USD_PER_TON = 0.0
-BIO_USD2018_PER_USD2024 = 0.80
+BIO_USD2018_PER_USD2024 = 0.80 # https://www.bls.gov/data/inflation_calculator.htm
 BIO_SPLIT_METHOD = "by_ba"
-
+# Census-division assignment for each of the 46 model zones, matching the
+# AEO fuel-region groupings in fuel_cost.csv. Used to look up coal prices in
+# the ReEDS coal_AEO_2025_reference.csv (columns are census divisions).
+ZONE_TO_CENSUS_DIV = {
+    # Pacific
+    "Bay_area": "Pacific", "LAX": "Pacific",
+    "San_Diego": "Pacific", "WA_and_OR": "Pacific",
+    # Mountain
+    "AZ": "Mountain", "CO": "Mountain", "ID_and_w_MT_and_w_WY": "Mountain",
+    "NM_and_w_TX": "Mountain", "NV_and_UT_and_n_CA": "Mountain",
+    "e_WY_and_w_SD": "Mountain",
+    # New England
+    "CT_and_RT": "New_England", "MA": "New_England",
+    "ME": "New_England", "VT_and_NH": "New_England",
+    # South Atlantic
+    "Central_FL": "South_Atlantic", "GA": "South_Atlantic",
+    "MD_and_VA_Island": "South_Atlantic", "NC": "South_Atlantic",
+    "SC": "South_Atlantic", "VA": "South_Atlantic",
+    "WV": "South_Atlantic", "se_FL": "South_Atlantic",
+    # Mid-Atlantic
+    "DE_and_NJ": "Mid_Atlantic", "NY": "Mid_Atlantic",
+    "New_York_City": "Mid_Atlantic", "PA": "Mid_Atlantic",
+    # West South Central
+    "Houston_ERCOT": "West_South_Central", "LA_and_e_TX": "West_South_Central",
+    "OK_and_e_NM_and_nw_TX": "West_South_Central",
+    "e_Texas_ERCOT": "West_South_Central", "w_TX_ERCOT": "West_South_Central",
+    # East South Central
+    "AL_and_e_MS_and_FL_pnh": "East_South_Central",
+    "TN_and_s_KY": "East_South_Central",
+    "e_AR_and_w_MS": "East_South_Central", "n_KY": "East_South_Central",
+    # West North Central
+    "IA": "West_North_Central", "KS_and_w_MO": "West_North_Central",
+    "MN_and_e_ND": "West_North_Central",
+    "NE_and_e_SD_and_w_ND_and_e_MT": "West_North_Central",
+    "e_MO": "West_North_Central",
+    # East North Central
+    "Chicago_and_sw_MI": "East_North_Central",
+    "IL_no_Chicago": "East_North_Central",
+    "IN_and_W_KY": "East_North_Central", "MI": "East_North_Central",
+    "OH": "East_North_Central", "WI_and_w_MI": "East_North_Central",
+}
 
 def clean_biomass(out_folder: Path, settings: dict, reeds_dir: Path) -> None:
     bio_csv = reeds_dir / "supply_curve" / "bio_supplycurve.csv"
@@ -561,14 +870,26 @@ def clean_biomass(out_folder: Path, settings: dict, reeds_dir: Path) -> None:
     # fuel_cost.csv and regional_fuel_markets.csv must be mutually exclusive
     # on fuel (Switch raises if a fuel appears in both). Strip any
     # waste_biomass rows from fuel_cost.csv, archiving the original first.
+    # Also repair coal prices. AEO reports a delivered coal price of 0 in
+    # census divisions where NEMS projects no coal deliveries to the power
+    # sector (New England in all years; most divisions by 2050), which
+    # would give coal generators there free fuel. Replace ALL coal prices
+    # with the AEO2025 reference coal prices as processed in ReEDS 2.0
+    # inputs (fuelprices/coal_AEO_2025_reference.csv; 2024$/MMBtu per
+    # ReEDS fuelprices/dollaryear.csv, matching base_financial_year in
+    # financials.csv). These are identical to the AEO values where AEO
+    # reports a price, carry forward each division's last reported price
+    # where the series ends, and proxy New England with South Atlantic.
     fuel_cost_path = out_folder / "fuel_cost.csv"
     if fuel_cost_path.exists():
         fc = pd.read_csv(fuel_cost_path)
         bio_mask = fc["fuel"] == BIO_FUEL_NAME
         n_bio = int(bio_mask.sum())
-        if n_bio > 0:
+        has_zero_coal = ((fc["fuel"] == "coal") & (fc["fuel_cost"] == 0)).any()
+        if n_bio > 0 or has_zero_coal:
             _archive_once(fc, out_folder / "fuel_cost_archive.csv")
-            fc[~bio_mask].to_csv(fuel_cost_path, index=False, na_rep=".")
+        if n_bio > 0:
+            fc = fc[~bio_mask].copy()
             logger.info(
                 f"[biomass] fuel_cost.csv: dropped {n_bio} {BIO_FUEL_NAME} row(s); "
                 f"archived original to fuel_cost_archive.csv."
@@ -576,6 +897,48 @@ def clean_biomass(out_folder: Path, settings: dict, reeds_dir: Path) -> None:
         else:
             logger.info(f"[biomass] fuel_cost.csv: no {BIO_FUEL_NAME} rows to drop.")
 
+        coal_mask = fc["fuel"] == "coal"
+        if coal_mask.any():
+            coal_price_path = reeds_dir / "fuelprices" / "coal_AEO_2025_reference.csv"
+            if not coal_price_path.exists():
+                raise FileNotFoundError(
+                    f"[biomass] ReEDS coal price file not found: {coal_price_path}. "
+                    "Needed to repair AEO zero coal prices in fuel_cost.csv."
+                )
+            reeds_coal = pd.read_csv(coal_price_path).set_index("year")
+
+            missing_zones = set(fc.loc[coal_mask, "load_zone"]) - set(ZONE_TO_CENSUS_DIV)
+            if missing_zones:
+                raise ValueError(
+                    f"[biomass] load zones missing from ZONE_TO_CENSUS_DIV: "
+                    f"{sorted(missing_zones)}"
+                )
+            missing_years = set(fc.loc[coal_mask, "period"]) - set(reeds_coal.index)
+            if missing_years:
+                raise ValueError(
+                    f"[biomass] period(s) missing from {coal_price_path.name}: "
+                    f"{sorted(missing_years)}"
+                )
+
+            before = fc.loc[coal_mask, "fuel_cost"].copy()
+            fc.loc[coal_mask, "fuel_cost"] = [
+                round(float(reeds_coal.loc[p, ZONE_TO_CENSUS_DIV[z]]), 5)
+                for z, p in zip(fc.loc[coal_mask, "load_zone"],
+                                fc.loc[coal_mask, "period"])
+            ]
+            n_changed = int((before != fc.loc[coal_mask, "fuel_cost"]).sum())
+            n_zero_fixed = int((before == 0).sum())
+            if (fc["fuel_cost"] == 0).any():
+                raise ValueError(
+                    "[biomass] fuel_cost.csv still contains zero prices after "
+                    "ReEDS coal repair."
+                )
+            logger.info(
+                f"[biomass] fuel_cost.csv: set {int(coal_mask.sum())} coal "
+                f"price(s) from {coal_price_path.name} "
+                f"({n_changed} changed, {n_zero_fixed} were zero)."
+            )
+        fc.to_csv(fuel_cost_path, index=False, na_rep=".")
     z2rfm = pd.DataFrame({
         "load_zone": list(zone_to_bas),
         "regional_fuel_market": [f"{lz}-{BIO_FUEL_NAME}" for lz in zone_to_bas],
@@ -873,6 +1236,9 @@ def main():
 
     try:
         enrich_gen_info(args.out_folder, pudl_db, extra_outputs)
+        patch_missing_coordinates(args.out_folder)
+        fix_coordinate_errors(args.out_folder)
+        fix_gen_project_renames(args.out_folder)
         clean_biopower_fuel_string(args.out_folder)
         fix_biopower_heat_rate(args.out_folder)
         fix_ccs_energy_load(args.out_folder)
